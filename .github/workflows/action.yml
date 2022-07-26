@@ -45,6 +45,8 @@ on:
         required: true
       DOCKER_PASSWORD:
         required: true
+      jenkins_url:
+        required: true 
       jenkins_password:
         required: true  
         
@@ -120,6 +122,7 @@ jobs:
             cat $propertiesFile   
           
       - name: Build image and push to DockerHub
+        if: github.event_name != 'pull_request'
         id: docker_build_push
         uses: docker/build-push-action@v2
         with:
@@ -142,22 +145,23 @@ jobs:
            # blackduck-api-token: ${{secrets.BLACKDUCK_TOKEN}}    
 
       - name: Trigger your-awesome-job-name job
+        if: github.event_name != 'pull_request'
         run: |  
           environment=${{inputs.environment}}
           if [ -z $environment ]; then
             echo "Deployment configuration not found"
           else
-            curl https://jenkins.avettatech.com/job/${{inputs.environment}}-deploy-generic/buildWithParameters \
-             --user avettajenkins:${{secrets.jenkins_password}} \
+            curl ${{secrets.jenkins_url}}/job/${{inputs.environment}}-deploy-generic/buildWithParameters \
+             --user ${{inputs.jenkins_user}}:${{secrets.jenkins_password}} \
              --data ContainerName=${{inputs.app_name}} --data DockerHubTag=${{inputs.image_tag}}
           fi
           
       #- name: Trigger jenkins job
        # uses: GoldenspearLLC/build-jenkins-job@master
         #with:
-         #   jenkins-url: https://jenkins.avettatech.com
+         #   jenkins-url: ${{secrets.jenkins_url}}
           #  jenkins-token: ${{ secrets.jenkins_password }}
-           # user: "avettajenkins"
+           # user: "${{inputs.jenkins_user}}"
             #job-path: "job/${{inputs.environment}}-deploy-generic"
             #job-params: "{'ContainerName': '${{inputs.app_name}}', 'DockerHubTag': '${{inputs.image_tag}}'}"
       #- name: Get job status
