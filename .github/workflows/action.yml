@@ -107,11 +107,13 @@ jobs:
               echo "File $propertiesFile does not exist. Creating conf directory"
               mkdir ./conf
             fi
+
             # Update $propertiesFile
             echo "Writing commit ID and build # to conf files."
             echo "tag=${{inputs.DOCKER_TAG}}" | sudo tee -a $propertiesFile
             echo "commit=${{inputs.GITHUB_COMMIT}}" | sudo tee -a $propertiesFile
             echo "buildId=${{inputs.GITHUB_BUILD_NUMBER}}" | sudo tee -a $propertiesFile
+
             echo "Writing commit ID and build # to version.json file"
             echo \{\"buildId\":\"${{inputs.GITHUB_BUILD_NUMBER}}\",\"commit\":\"${{inputs.GITHUB_COMMIT}}\",\"tag\":\"${{inputs.DOCKER_TAG}}\"\} > ./version.json
             # Copy in file to conf directory for Play builds
@@ -121,6 +123,7 @@ jobs:
             echo "Parameters in $propertiesFile"
             cat $propertiesFile   
           
+
       - name: Build image and push to DockerHub
         if: github.event_name != 'pull_request'
         id: docker_build_push
@@ -159,9 +162,9 @@ jobs:
       #- name: Trigger jenkins job
        # uses: GoldenspearLLC/build-jenkins-job@master
         #with:
-         #   jenkins-url: ${{secrets.jenkins_url}}
+         #   jenkins-url: https://jenkins.avettatech.com
           #  jenkins-token: ${{ secrets.jenkins_password }}
-           # user: "${{inputs.jenkins_user}}"
+           # user: "avettajenkins"
             #job-path: "job/${{inputs.environment}}-deploy-generic"
             #job-params: "{'ContainerName': '${{inputs.app_name}}', 'DockerHubTag': '${{inputs.image_tag}}'}"
       #- name: Get job status
