@@ -128,8 +128,8 @@ jobs:
             echo "Checking parameter values in $propertiesFile"
             echo "Parameters in $propertiesFile"
             cat $propertiesFile    
-      - name: Build image and push to DockerHub
-        id: docker_build_push
+      - name: Build image
+        id: docker_build
         uses: docker/build-push-action@v2
         with:
            # relative path to the place where source code with Dockerfile is located
@@ -150,6 +150,16 @@ jobs:
           echo "ENV JAVA_OPTS="-javaagent:/opt/docker/lib/newrelic.jar"" | sudo tee -a $Dockerfile
           echo "ADD {~}/newrelic/newrelic.jar /opt/docker/lib/" | sudo tee -a $Dockerfile
           echo "ADD {~}/newrelic/newrelic.yml /opt/docker/lib/" | sudo tee -a $Dockerfile
+          
+      - name: push to DockerHub
+        id: docker_build_push
+        uses: docker/build-push-action@v2
+        with:
+           # relative path to the place where source code with Dockerfile is located
+          context: .
+          push: true
+           # Note: tags has to be all lower-case
+          tags: pics/${{inputs.app_name}}:${{inputs.image_tag}}    
         
           
   
