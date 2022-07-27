@@ -128,16 +128,18 @@ jobs:
             echo "Checking parameter values in $propertiesFile"
             echo "Parameters in $propertiesFile"
             cat $propertiesFile    
-      - name: Build image and push to DockerHub
-        id: docker_build_push
-        uses: docker/build-push-action@v2
-        with:
+      #- name: Build image and push to DockerHub
+       # id: docker_build_push
+        #uses: docker/build-push-action@v2
+        #with:
            # relative path to the place where source code with Dockerfile is located
-          context: ./target/docker/stage
-          push: true
+         # context: ./target/docker/stage
+          #push: true
            # Note: tags has to be all lower-case
-          tags: pics/${{inputs.app_name}}:${{inputs.image_tag}}
-
+          #tags: pics/${{inputs.app_name}}:${{inputs.image_tag}}
+          
+      - name: Build the latest Docker image
+        run: docker build . --file ./target/docker/stage/Dockerfile --tag pics/${{inputs.app_name}}:${{inputs.image_tag}}
 
       - name: Trigger your-awesome-job-name job
         run: |  
