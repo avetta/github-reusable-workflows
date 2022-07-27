@@ -148,8 +148,9 @@ jobs:
           export Dockerfile="./Dockerfile"
           echo "FROM pics/${{inputs.app_name}}" | sudo tee -a $Dockerfile
           echo "ENV JAVA_OPTS="-javaagent:/opt/docker/lib/newrelic.jar"" | sudo tee -a $Dockerfile
-          echo "ADD {~}/newrelic/newrelic.jar /opt/docker/lib/" | sudo tee -a $Dockerfile
-          echo "ADD {~}/newrelic/newrelic.yml /opt/docker/lib/" | sudo tee -a $Dockerfile
+          echo "ADD ./newrelic/newrelic.jar /opt/docker/lib/" | sudo tee -a $Dockerfile
+          echo "ADD ./newrelic/newrelic.yml /opt/docker/lib/" | sudo tee -a $Dockerfile
+          ls -ltr
           
       - name: push to DockerHub
         id: docker_build_push
