@@ -138,8 +138,8 @@ jobs:
            # Note: tags has to be all lower-case
           tags: pics/${{inputs.app_name}}:${{inputs.image_tag}}
           
-     # - name: Build the latest Docker image
-      #  run: docker build . --file ./target/docker/stage/Dockerfile --tag pics/${{inputs.app_name}}:${{inputs.image_tag}}
+      - name: List Docker image
+        run: docker image ls
 
       - name: Trigger your-awesome-job-name job
         run: |  
