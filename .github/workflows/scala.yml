@@ -41,6 +41,8 @@ on:
     secrets:
       git_password:
         required: true
+      jenkins_url:
+        required: true  
       DOCKER_USERNAME:
         required: true
       DOCKER_PASSWORD:
