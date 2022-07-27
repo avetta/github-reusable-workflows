@@ -150,7 +150,7 @@ jobs:
           echo "ENV JAVA_OPTS="-javaagent:/opt/docker/lib/newrelic.jar"" | sudo tee -a $Dockerfile
           echo "ADD {~}/newrelic/newrelic.jar /opt/docker/lib/" | sudo tee -a $Dockerfile
           echo "ADD {~}/newrelic/newrelic.yml /opt/docker/lib/" | sudo tee -a $Dockerfile
-          cat $Dockerfile
+        
           
   
 
