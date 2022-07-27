@@ -134,36 +134,36 @@ jobs:
         with:
            # relative path to the place where source code with Dockerfile is located
           context: ./target/docker/stage
-          push: true
+          push: false
            # Note: tags has to be all lower-case
           tags: pics/${{inputs.app_name}}:${{inputs.image_tag}}
           
       - name: List Docker image
         run: docker image ls
         
-      #- name: EmbedAPM
-       # run: |
-        #  curl https://download.newrelic.com/newrelic/java-agent/newrelic-agent/7.5.0/newrelic-java-7.5.0.zip --output newrelic-java-7.5.0.zip
-         # unzip newrelic-java-7.5.0.zip
-          #export Dockerfile="./Dockerfile"
-          #echo "FROM pics/${{inputs.app_name}}" | sudo tee -a $Dockerfile
-          #echo "ENV JAVA_OPTS="-javaagent:/opt/docker/lib/newrelic.jar"" | sudo tee -a $Dockerfile
-          #echo "ADD ./newrelic/newrelic.jar /opt/docker/lib/" | sudo tee -a $Dockerfile
-          #echo "ADD ./newrelic/newrelic.yml /opt/docker/lib/" | sudo tee -a $Dockerfile
-          #ls -ltr
+      - name: EmbedAPM
+        run: |
+          curl https://download.newrelic.com/newrelic/java-agent/newrelic-agent/7.5.0/newrelic-java-7.5.0.zip --output newrelic-java-7.5.0.zip
+          unzip newrelic-java-7.5.0.zip
+          export Dockerfile="./Dockerfile"
+          echo "FROM pics/${{inputs.app_name}}" | sudo tee -a $Dockerfile
+          echo "ENV JAVA_OPTS="-javaagent:/opt/docker/lib/newrelic.jar"" | sudo tee -a $Dockerfile
+          echo "ADD ./newrelic/newrelic.jar /opt/docker/lib/" | sudo tee -a $Dockerfile
+          echo "ADD ./newrelic/newrelic.yml /opt/docker/lib/" | sudo tee -a $Dockerfile
+          ls -ltr
           
-      #- name: push to DockerHub
-       # id: docker_build_push
-        #uses: docker/build-push-action@v2
-        #with:
+      - name: Build image and push to DockerHub
+        id: docker_build_push
+        uses: docker/build-push-action@v2
+        with:
            # relative path to the place where source code with Dockerfile is located
-         # context: .
-          #push: true
+          context: .
+          push: true
            # Note: tags has to be all lower-case
-          #tags: pics/${{inputs.app_name}}:${{inputs.image_tag}}    
+          tags: pics/${{inputs.app_name}}:${{inputs.image_tag}}
+              
         
           
-  
 
       - name: Trigger your-awesome-job-name job
         run: |  
