@@ -37,6 +37,10 @@ on:
         description: Jenkins user
         required: true
         type: string  
+      embed_apm:
+        description: Jenkins user
+        required: true
+        type: string    
         
     secrets:
       git_password:
@@ -132,7 +136,7 @@ jobs:
             cat $propertiesFile  
         
       - name: Build image Build image and push to DockerHub
-        #if: github.event.inputs.embedapm != 'true'
+        if: ${{inputs.embed_apm}} == 'disable'
         id: docker_build
         uses: docker/build-push-action@v2
         with:
@@ -146,6 +150,7 @@ jobs:
         run: docker image ls
       
       - name: EmbedAPM
+        if: ${{inputs.embed_apm}} == 'enable'
         run: |
           curl https://download.newrelic.com/newrelic/java-agent/newrelic-agent/7.5.0/newrelic-java-7.5.0.zip --output newrelic-java-7.5.0.zip
           unzip newrelic-java-7.5.0.zip
@@ -157,6 +162,7 @@ jobs:
           ls -ltr
       
       - name: Build image and push to DockerHub
+        if: ${{inputs.embed_apm}} == 'enable'
         id: docker_build_push
         uses: docker/build-push-action@v2
         with:
