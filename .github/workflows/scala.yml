@@ -141,28 +141,37 @@ jobs:
 
       
         
-      - name: Build image Build image and push to DockerHub
+      - name: Build image and push to DockerHub
         #if: ${{inputs.embed_apm}} == 'disable'
         #if: ${{ inputs.embed_apm == false }}
         #if: inputs.embed_apm != ''
-        if: "${{ steps.setversion.outputs.embed_apm != 'true' }}"
-        id: docker_build
+        if: "${{ steps.setversion.outputs.embed_apm == 'false' }}"
+        id: docker_build1
+        uses: docker/build-push-action@v2
+        with:
+           # relative path to the place where source code with Dockerfile is located
+          context: ./target/docker/stage
+          push: true
+           # Note: tags has to be all lower-case
+          tags: pics/${{inputs.app_name}}:${{inputs.image_tag}}
+          
+      - name: Build image and push to DockerHub
+        #if: ${{inputs.embed_apm}} == 'disable'
+        #if: ${{ inputs.embed_apm == false }}
+        #if: inputs.embed_apm != ''
+        if: "${{ steps.setversion.outputs.embed_apm == 'true' }}"
+        id: docker_build2
         uses: docker/build-push-action@v2
         with:
            # relative path to the place where source code with Dockerfile is located
           context: ./target/docker/stage
           push: false
            # Note: tags has to be all lower-case
-          tags: pics/${{inputs.app_name}}:${{inputs.image_tag}}
+          tags: pics/${{inputs.app_name}}:${{inputs.image_tag}}    
           
-      - name: List Docker image
-        run: docker image ls
       
-      - name: EmbedAPM
-        #if: ${{inputs.embed_apm}} == 'enable'
-        #if: ${{ inputs.embed_apm == true }}
-        
-        if: "${{ steps.setversion.outputs.embed_apm != 'false' }}"
+      - name: EmbedAPM        
+        if: "${{ steps.setversion.outputs.embed_apm == 'true' }}"
         run: |
           curl https://download.newrelic.com/newrelic/java-agent/newrelic-agent/7.5.0/newrelic-java-7.5.0.zip --output newrelic-java-7.5.0.zip
           unzip newrelic-java-7.5.0.zip
@@ -174,9 +183,7 @@ jobs:
           ls -ltr
       
       - name: Build image and push to DockerHub
-        #if: ${{inputs.embed_apm}} == 'enable'
-        #if: ${{ inputs.embed_apm == true }}
-        if: "${{ steps.setversion.outputs.embed_apm != 'false' }}"
+        if: "${{ steps.setversion.outputs.embed_apm == 'true' }}"
         id: docker_build_push
         uses: docker/build-push-action@v2
         with:
