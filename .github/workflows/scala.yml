@@ -138,7 +138,7 @@ jobs:
         
       - name: Build image Build image and push to DockerHub
         #if: ${{inputs.embed_apm}} == 'disable'
-        if: ${{ inputs.embed_apm == disable }}
+        if: ${{ inputs.embed_apm == false }}
         id: docker_build
         uses: docker/build-push-action@v2
         with:
@@ -153,7 +153,7 @@ jobs:
       
       - name: EmbedAPM
         #if: ${{inputs.embed_apm}} == 'enable'
-        if: ${{ inputs.embed_apm == enable }}
+        if: ${{ inputs.embed_apm == true }}
         run: |
           curl https://download.newrelic.com/newrelic/java-agent/newrelic-agent/7.5.0/newrelic-java-7.5.0.zip --output newrelic-java-7.5.0.zip
           unzip newrelic-java-7.5.0.zip
@@ -166,7 +166,7 @@ jobs:
       
       - name: Build image and push to DockerHub
         #if: ${{inputs.embed_apm}} == 'enable'
-        if: ${{ inputs.embed_apm == enable }}
+        if: ${{ inputs.embed_apm == true }}
         id: docker_build_push
         uses: docker/build-push-action@v2
         with:
