@@ -111,6 +111,7 @@ jobs:
           username: ${{secrets.DOCKER_USERNAME}}
           password: ${{secrets.DOCKER_PASSWORD}}
       - name: set version files
+        id: setversion
         run: |
           # Check if $propertiesFile file exists. If not, create file
             export propertiesFile="./conf/serviceVersion.properties"
@@ -135,16 +136,17 @@ jobs:
             echo "Parameters in $propertiesFile"
             cat $propertiesFile  
             echo ${{inputs.embed_apm}}
+            echo '::set-output name=embed_apm::'${{inputs.embed_apm}}
             
           outputs:
-          embed_apm: ${{inputs.embed_apm}}
+            embed_apm: ${{ steps.setversion.outputs.embed_apm }}
       
         
       - name: Build image Build image and push to DockerHub
         #if: ${{inputs.embed_apm}} == 'disable'
         #if: ${{ inputs.embed_apm == false }}
         #if: inputs.embed_apm != ''
-        if: "${{ env.embed_apm != 'true' }}"
+        if: "${{ steps.setversion.outputs.embed_apm != 'true' }}"
         id: docker_build
         uses: docker/build-push-action@v2
         with:
@@ -161,7 +163,7 @@ jobs:
         #if: ${{inputs.embed_apm}} == 'enable'
         #if: ${{ inputs.embed_apm == true }}
         
-        if: "${{ env.embed_apm != 'false' }}"
+        if: "${{ steps.setversion.outputs.embed_apm != 'false' }}"
         run: |
           curl https://download.newrelic.com/newrelic/java-agent/newrelic-agent/7.5.0/newrelic-java-7.5.0.zip --output newrelic-java-7.5.0.zip
           unzip newrelic-java-7.5.0.zip
@@ -175,7 +177,7 @@ jobs:
       - name: Build image and push to DockerHub
         #if: ${{inputs.embed_apm}} == 'enable'
         #if: ${{ inputs.embed_apm == true }}
-        if: "${{ env.embed_apm != 'false' }}"
+        if: "${{ steps.setversion.outputs.embed_apm != 'false' }}"
         id: docker_build_push
         uses: docker/build-push-action@v2
         with:
