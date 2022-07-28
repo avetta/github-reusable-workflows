@@ -149,9 +149,9 @@ jobs:
           
       - name: List Docker image
         run: docker image ls
-        
-      - name: EmbedAPM
-        if: "${{ github.event.inputs.embed_apm == 'enable' }}"
+      
+      - if: "${{ github.event.inputs.embed_apm == 'enable' }}"
+        name: EmbedAPM
         run: |
           curl https://download.newrelic.com/newrelic/java-agent/newrelic-agent/7.5.0/newrelic-java-7.5.0.zip --output newrelic-java-7.5.0.zip
           unzip newrelic-java-7.5.0.zip
@@ -161,9 +161,9 @@ jobs:
           echo "ADD ./newrelic/newrelic.jar /opt/docker/lib/" | sudo tee -a $Dockerfile
           echo "ADD ./newrelic/newrelic.yml /opt/docker/lib/" | sudo tee -a $Dockerfile
           ls -ltr
-          
-      - name: Build image and push to DockerHub
-        if: "${{ github.event.inputs.embed_apm == 'enable' }}"
+      
+      - if: "${{ github.event.inputs.embed_apm == 'enable' }}"
+        name: Build image and push to DockerHub
         id: docker_build_push
         uses: docker/build-push-action@v2
         with:
