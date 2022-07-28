@@ -137,7 +137,7 @@ jobs:
             echo ${{inputs.embed_apm}}
             
           outputs:
-          embed_apm: ${{ inputs.embed_apm }}
+          embed_apm: ${{inputs.embed_apm}}
       
         
       - name: Build image Build image and push to DockerHub
