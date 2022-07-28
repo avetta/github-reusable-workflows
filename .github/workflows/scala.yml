@@ -136,7 +136,7 @@ jobs:
             cat $propertiesFile  
             
       - name: Build image Build image and push to DockerHub
-        if: ${{inputs.embedapm}} != 'true'
+        if: github.event.inputs.embedapm != 'true'
         id: docker_build
         uses: docker/build-push-action@v2
         with:
@@ -150,7 +150,7 @@ jobs:
         run: docker image ls
         
       - name: EmbedAPM
-        if: ${{inputs.embedapm}} != 'false'
+        if: github.event.inputs.embedapm != 'false'
         run: |
           curl https://download.newrelic.com/newrelic/java-agent/newrelic-agent/7.5.0/newrelic-java-7.5.0.zip --output newrelic-java-7.5.0.zip
           unzip newrelic-java-7.5.0.zip
@@ -162,7 +162,7 @@ jobs:
           ls -ltr
           
       - name: Build image and push to DockerHub
-        if: ${{inputs.embedapm}} != 'false'
+        if: github.event.inputs.embedapm != 'false'
         id: docker_build_push
         uses: docker/build-push-action@v2
         with:
