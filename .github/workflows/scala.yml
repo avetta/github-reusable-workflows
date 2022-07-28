@@ -134,6 +134,7 @@ jobs:
             echo "Checking parameter values in $propertiesFile"
             echo "Parameters in $propertiesFile"
             cat $propertiesFile  
+            echo ${{inputs.embed_apm}}
         
       - name: Build image Build image and push to DockerHub
         if: ${{inputs.embed_apm}} == 'disable'
