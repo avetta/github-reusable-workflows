@@ -152,7 +152,7 @@ jobs:
            # Note: tags has to be all lower-case
           tags: pics/${{inputs.app_name}}:${{inputs.image_tag}}
           
-      - name: Build image and push to DockerHub
+      - name: Build image
         if: "${{ steps.setversion.outputs.embed_apm != 'false' &&  github.event_name != 'pull_request'}}"
         id: docker_build2
         uses: docker/build-push-action@v2
