@@ -121,7 +121,8 @@ jobs:
           wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1604-4.2.19.tgz
           ls -ltr
           tar xzf mongodb-linux-x86_64-ubuntu1604-4.2.19.tgz
-          sudo /sbin/ldconfig -v
+          sudo ln -s ./mongodb-correct-version/bin/mongod /usr/local/bin/mongod
+          sudo ln -s ./mongodb-correct-version/bin/mongo /usr/local/bin/mongo
           ./mongodb-linux-x86_64-ubuntu1604-4.2.19/bin/mongod --version
           mkdir ./mongodb-linux-x86_64-ubuntu1604-4.2.19/data
           ./mongodb-linux-x86_64-ubuntu1604-4.2.19/bin/mongod --dbpath ${PWD}/${{secrets.MONGODB_WD}}/data --logpath ${PWD}/${{secrets.MONGODB_WD}}/mongodb.log --fork
