@@ -122,7 +122,7 @@ jobs:
           ls -ltr
           tar xzf mongodb-linux-x86_64-ubuntu1604-4.2.19.tgz
           chmod 777 mongodb-linux-x86_64-ubuntu1604-4.2.19/*
-          sudo apt-get install libssl1.0.0
+          #sudo apt-get install libssl1.0.0
           #./mongodb-linux-x86_64-ubuntu1604-4.2.19/bin/mongod --version
           mkdir ${PWD}/mongodb-linux-x86_64-ubuntu1604-4.2.19/data
           ${PWD}/mongodb-linux-x86_64-ubuntu1604-4.2.19/bin/mongod --dbpath ${PWD}/${{secrets.MONGODB_WD}}/data --logpath ${PWD}/${{secrets.MONGODB_WD}}/mongodb.log --fork
