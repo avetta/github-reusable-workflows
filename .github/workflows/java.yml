@@ -123,7 +123,7 @@ jobs:
           ls -ltr
           tar -zxvf mongodb-linux-x86_64-ubuntu1604-4.2.19.tgz
           echo $PATH
-          sudo ln -s ${PWD}/mongodb-linux-x86_64-ubuntu1604-4.2.19/bin/mongod /usr/local/sbin/bin/mongod 
+          sudo ln -s ${PWD}/mongodb-linux-x86_64-ubuntu1604-4.2.19/bin/mongod /usr/local/bin/mongod 
           mongod --version
           sudo ln -s ${PWD}/mongodb-linux-x86_64-ubuntu1604-4.2.19/bin/mongo /usr/local/bin/mongod 
           mongo --version
