@@ -122,18 +122,15 @@ jobs:
           wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1804-4.2.21.tgz
           ls -ltr
           tar -zxvf mongodb-linux-x86_64-ubuntu1804-4.2.21.tgz
-          echo $PATH
-          sudo apt-get update
-          sudo apt-get install libssl1.1
-          sudo ln -s ${PWD}/mongodb-linux-x86_64-ubuntu1604-4.2.19/bin/mongod /usr/local/bin/mongod 
-          mongod --version
-          sudo ln -s ${PWD}/mongodb-linux-x86_64-ubuntu1604-4.2.19/bin/mongo /usr/local/bin/mongod 
-          mongo --version
+          #sudo ln -s ${PWD}/mongodb-linux-x86_64-ubuntu1604-4.2.19/bin/mongod /usr/local/bin/mongod 
+          #mongod --version
+          #sudo ln -s ${PWD}/mongodb-linux-x86_64-ubuntu1604-4.2.19/bin/mongo /usr/local/bin/mongod 
+          #mongo --version
           #./mongodb-linux-x86_64-ubuntu1604-4.2.19/bin/mongod --version
-          mkdir ${PWD}/mongodb-linux-x86_64-ubuntu1604-4.2.19/data
-          ${PWD}/mongodb-linux-x86_64-ubuntu1604-4.2.19/bin/mongod --dbpath ${PWD}/${{secrets.MONGODB_WD}}/data --logpath ${PWD}/${{secrets.MONGODB_WD}}/mongodb.log --fork
-          ${PWD}/mongodb-linux-x86_64-ubuntu1604-4.2.19/bin/mongo scoring --eval 'db.createUser({user:"${{secrets.INPUTCONFIGSERVICE_MONGO_USER}}",pwd:"${{secrets.INPUTCONFIGSERVICE_MONGO_PWD}}",roles:[{role:"readWrite",db:"scoring"}]});'
-          ${PWD}/mongodb-linux-x86_64-ubuntu1604-4.2.19/bin/mongo input_config --eval 'db.createUser({user:"${{secrets.INPUTCONFIGSERVICE_MONGO_USER}}",pwd:"${{secrets.INPUTCONFIGSERVICE_MONGO_PWD}}",roles:[{role:"readWrite",db:"input_config"}]});'
+          mkdir ${PWD}/mongodb-linux-x86_64-ubuntu1804-4.2.21/data
+          ${PWD}/mongodb-linux-x86_64-ubuntu1804-4.2.21/bin/mongod --dbpath ${PWD}/${{secrets.MONGODB_WD}}/data --logpath ${PWD}/${{secrets.MONGODB_WD}}/mongodb.log --fork
+          ${PWD}/mongodb-linux-x86_64-ubuntu1804-4.2.21/bin/mongo scoring --eval 'db.createUser({user:"${{secrets.INPUTCONFIGSERVICE_MONGO_USER}}",pwd:"${{secrets.INPUTCONFIGSERVICE_MONGO_PWD}}",roles:[{role:"readWrite",db:"scoring"}]});'
+          ${PWD}/mongodb-linux-x86_64-ubuntu1804-4.2.21/bin/mongo input_config --eval 'db.createUser({user:"${{secrets.INPUTCONFIGSERVICE_MONGO_USER}}",pwd:"${{secrets.INPUTCONFIGSERVICE_MONGO_PWD}}",roles:[{role:"readWrite",db:"input_config"}]});'
           sbt ++${{inputs.scala_version}} clean coverage compile test
           sbt ++${{inputs.scala_version}} coverageReport
           sbt docker:stage
