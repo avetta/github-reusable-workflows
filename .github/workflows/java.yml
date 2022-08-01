@@ -120,11 +120,12 @@ jobs:
           export JFROG_RO_PASSWORD=${{secrets.JFROG_PASSWORD}}
           wget https://fastdl.mongodb.org/linux/${{secrets.MONGODB_ARCHIVE}}
           tar xzf ${{secrets.MONGODB_ARCHIVE}}
-          ${PWD}/${{secrets.MONGODB_WD}}/bin/mongod --version
-          mkdir ${PWD}/${{secrets.MONGODB_WD}}/data
-          ${PWD}/${{secrets.MONGODB_WD}}/bin/mongod --dbpath ${PWD}/${{secrets.MONGODB_WD}}/data --logpath ${PWD}/${{secrets.MONGODB_WD}}/mongodb.log --fork
-          ${PWD}/${{secrets.MONGODB_WD}}/bin/mongo scoring --eval 'db.createUser({user:"${{secrets.INPUTCONFIGSERVICE_MONGO_USER}}",pwd:"${{secrets.INPUTCONFIGSERVICE_MONGO_PWD}}",roles:[{role:"readWrite",db:"scoring"}]});'
-          ${PWD}/${{secrets.MONGODB_WD}}/bin/mongo input_config --eval 'db.createUser({user:"${{secrets.INPUTCONFIGSERVICE_MONGO_USER}}",pwd:"${{secrets.INPUTCONFIGSERVICE_MONGO_PWD}}",roles:[{role:"readWrite",db:"input_config"}]});'
+          ./${{secrets.MONGODB_WD}}/bin/mongod --version
+          ls -ltr
+          mkdir ./${{secrets.MONGODB_WD}}/data
+          ./${{secrets.MONGODB_WD}}/bin/mongod --dbpath ${PWD}/${{secrets.MONGODB_WD}}/data --logpath ${PWD}/${{secrets.MONGODB_WD}}/mongodb.log --fork
+          ./${{secrets.MONGODB_WD}}/bin/mongo scoring --eval 'db.createUser({user:"${{secrets.INPUTCONFIGSERVICE_MONGO_USER}}",pwd:"${{secrets.INPUTCONFIGSERVICE_MONGO_PWD}}",roles:[{role:"readWrite",db:"scoring"}]});'
+          ./${{secrets.MONGODB_WD}}/bin/mongo input_config --eval 'db.createUser({user:"${{secrets.INPUTCONFIGSERVICE_MONGO_USER}}",pwd:"${{secrets.INPUTCONFIGSERVICE_MONGO_PWD}}",roles:[{role:"readWrite",db:"input_config"}]});'
           sbt ++${{inputs.scala_version}} clean coverage compile test
           sbt ++${{inputs.scala_version}} coverageReport
           sbt docker:stage
