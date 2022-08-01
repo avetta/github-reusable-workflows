@@ -86,7 +86,7 @@ jobs:
     name: Build and Test
     strategy:
       matrix:
-        os: [ubuntu-22.04]
+        os: [ubuntu-18.04]
         java: [adopt@1.8]
     runs-on: ${{ matrix.os }}
     steps:
@@ -119,9 +119,9 @@ jobs:
           export JFROG_RO_USER=${{secrets.JFROG_USERNAME}}
           export JFROG_RO_PASSWORD=${{secrets.JFROG_PASSWORD}}
           #sudo apt-get install -y mongodb-org
-          wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1604-4.2.19.tgz
+          wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1804-4.2.21.tgz
           ls -ltr
-          tar -zxvf mongodb-linux-x86_64-ubuntu1604-4.2.19.tgz
+          tar -zxvf mongodb-linux-x86_64-ubuntu1804-4.2.21.tgz
           echo $PATH
           sudo apt-get update
           sudo apt-get install libssl1.1
