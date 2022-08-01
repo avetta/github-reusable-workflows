@@ -119,7 +119,7 @@ jobs:
           export JFROG_RO_USER=${{secrets.JFROG_USERNAME}}
           export JFROG_RO_PASSWORD=${{secrets.JFROG_PASSWORD}}
           wget https://fastdl.mongodb.org/linux/${{secrets.MONGODB_ARCHIVE}}
-          tar xzf $MONGODB_ARCHIVE
+          tar xzf ${{secrets.MONGODB_ARCHIVE}}
           ${PWD}/${{secrets.MONGODB_WD}}/bin/mongod --version
           mkdir ${PWD}/${{secrets.MONGODB_WD}}/data
           ${PWD}/${{secrets.MONGODB_WD}}/bin/mongod --dbpath ${PWD}/${{secrets.MONGODB_WD}}/data --logpath ${PWD}/${{secrets.MONGODB_WD}}/mongodb.log --fork
