@@ -101,8 +101,9 @@ jobs:
           export JFROG_PASSWORD=${{secrets.JFROG_PASSWORD}}
           export JFROG_RO_USER=${{secrets.JFROG_USERNAME}}
           export JFROG_RO_PASSWORD=${{secrets.JFROG_PASSWORD}}
-          sbt ++${{inputs.scala_version}} clean coverage compile test
-          sbt ++${{inputs.scala_version}} coverageReport
+          #sbt ++${{inputs.scala_version}} clean coverage compile test
+          #sbt ++${{inputs.scala_version}} coverageReport
+          sbt ++${{inputs.scala_version}} clean coverage test it:test coverageReport
           sbt docker:stage
 
       - name: Login to DockerHub
