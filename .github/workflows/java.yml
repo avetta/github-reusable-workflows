@@ -118,11 +118,15 @@ jobs:
           export JFROG_PASSWORD=${{secrets.JFROG_PASSWORD}}
           export JFROG_RO_USER=${{secrets.JFROG_USERNAME}}
           export JFROG_RO_PASSWORD=${{secrets.JFROG_PASSWORD}}
+          sudo apt-get install -y mongodb-org
           wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1604-4.2.19.tgz
           ls -ltr
-          tar xzf mongodb-linux-x86_64-ubuntu1604-4.2.19.tgz
-          chmod 777 mongodb-linux-x86_64-ubuntu1604-4.2.19/*
-          #sudo apt-get install libssl1.0.0
+          tar -zxvf mongodb-linux-x86_64-ubuntu1604-4.2.19.tgz
+          echo $PATH
+          sudo ln -s ${PWD}/mongodb-linux-x86_64-ubuntu1604-4.2.19/bin/mongod /usr/local/bin/mongod 
+          mongod --version
+          sudo ln -s ${PWD}/mongodb-linux-x86_64-ubuntu1604-4.2.19/bin/mongo /usr/local/bin/mongod 
+          mongo --version
           #./mongodb-linux-x86_64-ubuntu1604-4.2.19/bin/mongod --version
           mkdir ${PWD}/mongodb-linux-x86_64-ubuntu1604-4.2.19/data
           ${PWD}/mongodb-linux-x86_64-ubuntu1604-4.2.19/bin/mongod --dbpath ${PWD}/${{secrets.MONGODB_WD}}/data --logpath ${PWD}/${{secrets.MONGODB_WD}}/mongodb.log --fork
