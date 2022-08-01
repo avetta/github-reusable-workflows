@@ -69,7 +69,6 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        scala: [2.13.7]
         java: [adopt@1.8]
     runs-on: ${{ matrix.os }}
     steps:
@@ -99,8 +98,8 @@ jobs:
         run: |
           export JFROG_USER=${{secrets.JFROG_USERNAME}}
           export JFROG_PASSWORD=${{secrets.JFROG_PASSWORD}}
-          sbt ++${{ matrix.scala }} clean coverage compile test
-          sbt ++${{ matrix.scala }} coverageReport
+          sbt ++${{inputs.scala_version}} clean coverage compile test
+          sbt ++${{inputs.scala_version}} coverageReport
           sbt docker:stage
           #docker build -t pics/recalcservice ./target/docker/stage
           #docker images
