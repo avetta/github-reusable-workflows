@@ -116,7 +116,7 @@ jobs:
         run: |
           wget https://fastdl.mongodb.org/linux/${{secrets.MONGODB_ARCHIVE}}
           tar -zxvf ${{secrets.MONGODB_ARCHIVE}}
-          ${PWD}/mongodb-linux-x86_64-ubuntu1804-4.2.19/bin/mongod --version
+          ${PWD}/${{secrets.MONGODB_WD}/bin/mongod --version
           mkdir ${PWD}/mongodb-linux-x86_64-ubuntu1804-4.2.19/data
           ${PWD}/mongodb-linux-x86_64-ubuntu1804-4.2.19/bin/mongod --dbpath ${PWD}/${{secrets.MONGODB_WD}}/data --logpath ${PWD}/${{secrets.MONGODB_WD}}/mongodb.log --fork
           ${PWD}/mongodb-linux-x86_64-ubuntu1804-4.2.19/bin/mongo scoring --eval 'db.createUser({user:"${{secrets.INPUTCONFIGSERVICE_MONGO_USER}}",pwd:"${{secrets.INPUTCONFIGSERVICE_MONGO_PWD}}",roles:[{role:"readWrite",db:"scoring"}]});'
