@@ -114,6 +114,8 @@ jobs:
           
       - name: Install Mongodb
         run: |
+          export JFROG_USER=${{secrets.JFROG_USERNAME}}
+          export JFROG_PASSWORD=${{secrets.JFROG_PASSWORD}}
           wget https://fastdl.mongodb.org/linux/${{secrets.MONGODB_ARCHIVE}}
           tar -zxvf ${{secrets.MONGODB_ARCHIVE}}
           ${PWD}/${{secrets.MONGODB_WD}}/bin/mongod --version
