@@ -123,8 +123,9 @@ jobs:
           ls -ltr
           tar -zxvf mongodb-linux-x86_64-ubuntu1604-4.2.19.tgz
           echo $PATH
-          wget http://nz2.archive.ubuntu.com/ubuntu/pool/main/o/openssl/openssl_1.0.1f-1ubuntu2.27_amd64.deb
-          sudo dpkg -i 	openssl_1.0.1f-1ubuntu2.27_amd64.deb
+          echo "deb http://security.ubuntu.com/ubuntu impish-security main" | sudo tee /etc/apt/sources.list.d/impish-security.list
+          sudo apt-get update
+          sudo apt-get install libssl1.1
           sudo ln -s ${PWD}/mongodb-linux-x86_64-ubuntu1604-4.2.19/bin/mongod /usr/local/bin/mongod 
           mongod --version
           sudo ln -s ${PWD}/mongodb-linux-x86_64-ubuntu1604-4.2.19/bin/mongo /usr/local/bin/mongod 
