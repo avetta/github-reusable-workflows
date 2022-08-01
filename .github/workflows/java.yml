@@ -122,6 +122,11 @@ jobs:
           ls -ltr
           tar xzf mongodb-linux-x86_64-ubuntu1604-4.2.19.tgz
           sudo apt-get update
+          sudo apt-get update
+          sudo apt-get install libssl1.0.0 libssl-dev
+          cd /lib/x86_64-linux-gnu
+          sudo ln -s libssl.so.1.0.0 libssl.so.10
+          sudo ln -s libcrypto.so.1.0.0 libcrypto.so.10
           chmod 777 mongodb-linux-x86_64-ubuntu1604-4.2.19/*
           #sudo apt-get install --reinstall libssl1.0.0
           sudo ln -s ./mongodb-linux-x86_64-ubuntu1604-4.2.19/bin/mongod /usr/local/bin/mongod
