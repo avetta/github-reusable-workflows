@@ -61,6 +61,24 @@ on:
       JFROG_USERNAME:
         required: true
       JFROG_PASSWORD:
+        required: true
+      MONGODB_WD:
+        required: true
+      MONGODB_HOST:
+        required: true  
+      SCORINGSERVICE_MONGO_USER:
+        required: true  
+      SCORINGSERVICE_MONGO_PWD:
+        required: true 
+      SCORING_MONGO_AUTHENTICATION:
+        required: true 
+      INPUTCONFIGSERVICE_MONGO_USER:
+        required: true 
+      INPUTCONFIGSERVICE_MONGO_PWD:
+        required: true 
+      INPUTCONFIGSERVICE_MONGO_AUTHENTICATION:
+        required: true 
+      MONGODB_ARCHIVE:
         required: true  
         
 jobs:
@@ -100,6 +118,10 @@ jobs:
           export JFROG_PASSWORD=${{secrets.JFROG_PASSWORD}}
           export JFROG_RO_USER=${{secrets.JFROG_USERNAME}}
           export JFROG_RO_PASSWORD=${{secrets.JFROG_PASSWORD}}
+          mkdir ${PWD}/${{secrets.MONGODB_WD}}/data
+          ${PWD}/${{secrets.MONGODB_WD}}/bin/mongod --dbpath ${PWD}/${{secrets.MONGODB_WD}}/data --logpath ${PWD}/${{secrets.MONGODB_WD}}/mongodb.log --fork
+          ${PWD}/${{secrets.MONGODB_WD}}/bin/mongo scoring --eval 'db.createUser({user:"${{secrets.INPUTCONFIGSERVICE_MONGO_USER}}",pwd:"${{secrets.INPUTCONFIGSERVICE_MONGO_PWD}}",roles:[{role:"readWrite",db:"scoring"}]});'
+          ${PWD}/${{secrets.MONGODB_WD}}/bin/mongo input_config --eval 'db.createUser({user:"${{secrets.INPUTCONFIGSERVICE_MONGO_USER}}",pwd:"${{secrets.INPUTCONFIGSERVICE_MONGO_PWD}}",roles:[{role:"readWrite",db:"input_config"}]});'
           sbt ++${{inputs.scala_version}} clean coverage compile test
           sbt ++${{inputs.scala_version}} coverageReport
           sbt docker:stage
