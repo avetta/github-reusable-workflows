@@ -9,6 +9,11 @@ on:
         required: true
         type: string
         default: 'latest'
+      scala_version:
+        description: Image tag of the docker image
+        required: true
+        type: string
+        default: 'latest'  
       git_user:
         description: username to access github repo
         required: true
@@ -64,7 +69,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        scala: [2.13.7]
+        scala: ${{inputs.scala_version}}
         java: [adopt@1.8]
     runs-on: ${{ matrix.os }}
     steps:
