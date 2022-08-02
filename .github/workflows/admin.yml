@@ -223,3 +223,4 @@ jobs:
             curl ${{secrets.jenkins_url}}/job/${{inputs.environment}}-deploy-generic/buildWithParameters \
              --user ${{inputs.jenkins_user}}:${{secrets.jenkins_password}} \
              --data ContainerName=${{inputs.app_name}} --data DockerHubTag=${{inputs.image_tag}}
+             fi
