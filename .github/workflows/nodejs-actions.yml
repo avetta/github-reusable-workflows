@@ -97,7 +97,9 @@ jobs:
             # Output for verification purposes
             echo "Checking parameter values in $propertiesFile"
             echo "Parameters in $propertiesFile"
-            cat $propertiesFile     
+            cat $propertiesFile 
+            echo ${{inputs.embed_apm}}
+            echo '::set-output name=embed_apm::'${{inputs.embed_apm}}
       - name: Build image and push to DockerHub
         if: "${{ steps.setversion.outputs.embed_apm != 'true' &&  github.event_name != 'pull_request'}}"
         id: docker_build1
