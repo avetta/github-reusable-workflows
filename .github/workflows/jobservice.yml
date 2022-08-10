@@ -100,7 +100,7 @@ jobs:
           export JFROG_PASSWORD=${{secrets.JFROG_PASSWORD}}
           export JFROG_RO_USER=${{secrets.JFROG_USERNAME}}
           export JFROG_RO_PASSWORD=${{secrets.JFROG_PASSWORD}}
-          sbt docker:stage
+          sbt jobRunner/docker:stage
           
      # - name: Report coverage to Codacy
       #  uses: codacy/codacy-coverage-reporter-action@0.2.1
@@ -148,7 +148,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
            # relative path to the place where source code with Dockerfile is located
-          context: ./target/docker/stage
+          context: ./jobRunner/target/docker/stage
           push: true
            # Note: tags has to be all lower-case
           tags: pics/${{inputs.app_name}}:${{inputs.image_tag}}
@@ -159,7 +159,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
            # relative path to the place where source code with Dockerfile is located
-          context: ./target/docker/stage
+          context: ./jobRunner/target/docker/stage
           push: false
            # Note: tags has to be all lower-case
           tags: pics/${{inputs.app_name}}:${{inputs.image_tag}}    
