@@ -150,7 +150,7 @@ jobs:
       - name: Run list and prettier and elm-format
         run: |
           npm install
-          #npm run coverage
+          npm run test
           npm prune --production 
           
       - name: Trigger your-awesome-job-name job
