@@ -147,7 +147,7 @@ jobs:
       
         
       - name: Build image and push to DockerHub
-        if: "${{ steps.setversion.outputs.embed_apm = 'false' &&  github.event_name != 'pull_request'}}"
+        if: "${{ steps.setversion.outputs.embed_apm == 'false' &&  github.event_name != 'pull_request'}}"
         id: docker_build1
         uses: docker/build-push-action@v2
         with:
@@ -158,7 +158,7 @@ jobs:
           tags: pics/${{inputs.app_name}}:${{inputs.image_tag}}
           
       - name: Build image
-        if: "${{ steps.setversion.outputs.embed_apm = 'true' &&  github.event_name != 'pull_request'}}"
+        if: "${{ steps.setversion.outputs.embed_apm == 'true' &&  github.event_name != 'pull_request'}}"
         id: docker_build2
         uses: docker/build-push-action@v2
         with:
