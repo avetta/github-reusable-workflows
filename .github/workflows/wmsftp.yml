@@ -1,145 +1,162 @@
-name: Avetta UI application Build and Deploy to using Github Actions and ArgoCD
+# action.yml
+name: 'Custom Github Action to Update Deployment YAML files'
+
 on:
-  # run it on push to the default repository branch
-  create:
-    branches-ignore:
-      - '*'
-  push:
-    branches:
-      - '*'
-    tags:
-      - '*'
-  # run it during pull request
-  #pull_request:
-   # branches:
-    #  - '*'
-  # run it during release
-  # release:
-  #  types: [published, created, edited]
+  workflow_call:
+    inputs:
+      image_tag:
+        description: Image tag of the docker image
+        required: true
+        type: string
+        default: 'latest'
+      git_user:
+        description: username to access github repo
+        required: true
+        type: string
+      app_name:
+        description: App name to be update
+        required: true
+        type: string
+      environment:
+        description: Environment to be update
+        required: true
+        type: string
+      jenkins_user:
+        description: Jenkins user
+        required: true
+        type: string
+      DOCKER_TAG:
+        description: Jenkins user
+        required: true
+        type: string
+      GITHUB_COMMIT:
+        description: Jenkins user
+        required: true
+        type: string
+      GITHUB_BUILD_NUMBER:
+        description: Jenkins user
+        required: true
+        type: string
+      embed_apm:
+        description: Jenkins user
+        required: false
+        type: string   
+        
+    secrets:
+      git_password:
+        required: true
+      DOCKER_USERNAME:
+        required: true
+      DOCKER_PASSWORD:
+        required: true
+      jenkins_url:
+        required: true   
+      jenkins_password:
+        required: true
+      JFROG_USERNAME:
+        required: true
+      JFROG_PASSWORD:
+        required: true  
+        
 jobs:
-  Docker-Build-and-Deploy:
+  build-and-push-docker-image:
     # run only when code is compiling and tests are passing
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 0
+          fetch-depth: 0      
 
-      - name: Setup Environment Name and Tag
-        id: gen_tag
-        run: |
-          REPO_NAME=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]') >> $GITHUB_ENV
-          if [[ ${GITHUB_REF#refs/heads/} == 'main' ]]; then
-            TAG=latest
-          else
-            #TAG=${GITHUB_REF#refs/heads/}
-            TAG=${GITHUB_REF#refs/*/}
-          fi
-          echo '::set-output name=tag::'$TAG
-          echo '::set-output name=repo_name::'${{ github.repository_owner }}/${{ github.event.repository.name }}
-          echo '::set-output name=app_name::'${{ github.event.repository.name }}
-          echo 'repo name is : '${{ github.repository_owner }}/${{ github.event.repository.name }}
-          echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
-          echo "Sha: ${{ steps.gen_tag.outputs.sha_short }}"
-          IFS='_' read -r -a array <<< "${GITHUB_REF#refs/*/}"
-          branchName=${array[0]}
-          echo $branchName
-          echo '::set-output name=branchName::'$branchName
-          
-      - name: Get commit tag
-        uses: little-core-labs/get-git-tag@v3.0.1
-        id: tagName
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
         with:
-          tagRegex: ""  # Optional. Returns specified group text as tag name. Full tag string is returned if regex is not defined.
-          tagRegexGroup: 1 # Optional. Default is 1.
+          username: ${{secrets.DOCKER_USERNAME}}
+          password: ${{secrets.DOCKER_PASSWORD}}
+          
+      - name: set version files
+        id: setversion
+        run: |
+          # Check if $propertiesFile file exists. If not, create file
+            export propertiesFile="./conf/serviceVersion.properties"
+            if [ -f $propertiesFile ];
+            then
+              echo "File $propertiesFile exists."
+            else
+              echo "File $propertiesFile does not exist. Creating conf directory"
+              mkdir ./conf
+            fi
+            # Update $propertiesFile
+            echo "Writing commit ID and build # to conf files."
+            echo "tag=${{inputs.DOCKER_TAG}}" | sudo tee -a $propertiesFile
+            echo "commit=${{inputs.GITHUB_COMMIT}}" | sudo tee -a $propertiesFile
+            echo "buildId=${{inputs.GITHUB_BUILD_NUMBER}}" | sudo tee -a $propertiesFile
+            echo "Writing commit ID and build # to version.json file"
+            echo \{\"buildId\":\"${{inputs.GITHUB_BUILD_NUMBER}}\",\"commit\":\"${{inputs.GITHUB_COMMIT}}\",\"tag\":\"${{inputs.DOCKER_TAG}}\"\} > ./version.json
+            # Copy in file to conf directory for Play builds
+            cp ./version.json ./conf/version.json
+            # Output for verification purposes
+            echo "Checking parameter values in $propertiesFile"
+            echo "Parameters in $propertiesFile"
+            cat $propertiesFile 
+            echo ${{inputs.embed_apm}}
+            echo '::set-output name=embed_apm::'${{inputs.embed_apm}}
+      - name: Build image and push to DockerHub
+        if: "${{ steps.setversion.outputs.embed_apm != 'true' &&  github.event_name != 'pull_request'}}"
+        id: docker_build1
+        uses: docker/build-push-action@v2
+        with:
+           # relative path to the place where source code with Dockerfile is located
+          context: .
+          push: true
+           # Note: tags has to be all lower-case
+          tags: pics/${{inputs.app_name}}:${{inputs.image_tag}}
+          
+      - name: Build image
+        if: "${{ steps.setversion.outputs.embed_apm != 'false' &&  github.event_name != 'pull_request'}}"
+        id: docker_build2
+        uses: docker/build-push-action@v2
+        with:
+           # relative path to the place where source code with Dockerfile is located
+          context: .
+          push: false
+           # Note: tags has to be all lower-case
+          tags: pics/${{inputs.app_name}}:${{inputs.image_tag}} 
+          
+      - name: EmbedAPM        
+        if: "${{ steps.setversion.outputs.embed_apm != 'false' &&  github.event_name != 'pull_request'}}"
+        run: |
+          curl https://download.newrelic.com/newrelic/java-agent/newrelic-agent/7.5.0/newrelic-java-7.5.0.zip --output newrelic-java-7.5.0.zip
+          unzip newrelic-java-7.5.0.zip
+          export Dockerfile="./Dockerfile"
+          echo "FROM pics/${{inputs.app_name}}" | sudo tee -a $Dockerfile
+          echo "ENV JAVA_OPTS="-javaagent:/opt/docker/lib/newrelic.jar"" | sudo tee -a $Dockerfile
+          echo "ADD ./newrelic/newrelic.jar /opt/docker/lib/" | sudo tee -a $Dockerfile
+          echo "ADD ./newrelic/newrelic.yml /opt/docker/lib/" | sudo tee -a $Dockerfile
+          ls -ltr
+          
+      - name: Build image and push to DockerHub
+        if: "${{ steps.setversion.outputs.embed_apm != 'false' &&  github.event_name != 'pull_request'}}"
+        id: docker_build_push
+        uses: docker/build-push-action@v2
+        with:
+           # relative path to the place where source code with Dockerfile is located
+          context: .
+          push: true
+           # Note: tags has to be all lower-case
+          tags: pics/${{inputs.app_name}}:${{inputs.image_tag}}    
 
-      - name: GIT_TAG_NAME
-        run: |
-          echo "${{ steps.tagName.outputs.tag }}"
-          
-      - name: Some check on branch
-        id: branch_check
-        run: |
-          if [ -z "${{ steps.tagName.outputs.tag }}" ]
-          then
-                echo "\${{ steps.tagName.outputs.tag }} is empty"
-          else
-                echo "::set-output name=env_name::qa"
-          fi
-          echo "Running on branch ${{ github.ref_name }}"
-          if [ "${{ steps.gen_tag.outputs.branchName }}" = "feature" ]; then
-            echo "::set-output name=env_name::dev"
-          fi
-          if [ "${{ steps.gen_tag.outputs.branchName }}" = "nightly" ]; then
-            echo "::set-output name=env_name::int"
-          fi
-          if [ "${{ steps.gen_tag.outputs.branchName }}" = "release" ]; then
-            echo "::set-output name=env_name::qa"
-          fi
-          if [ "${{ steps.gen_tag.outputs.branchName }}" = "patch" ]; then
-            echo "::set-output name=env_name::qa"
-          fi
-          
-          echo "::set-output name=scala_version::2.13.7"
-      - name: Use variable setup in previous step
-        run: |
-          echo "I'm using variable ${{ steps.branch_check.outputs.env_name }}"
-          echo "I'm using variable ${{ steps.branch_check.outputs.scala_version }}"
-          echo "I'm using tag ${{ steps.gen_tag.outputs.tag }}"
-          
-      - name: Install Mongodb
-        run: |
-          export JFROG_USER=${{secrets.JFROG_USERNAME}}
-          export JFROG_PASSWORD=${{secrets.JFROG_PASSWORD}}
-          wget https://fastdl.mongodb.org/linux/$MONGODB_ARCHIVE
-          tar -zxvf $MONGODB_ARCHIVE
-          ${PWD}/$MONGODB_WD/bin/mongod --version
-          mkdir ${PWD}/$MONGODB_WD/data
-          ${PWD}/$MONGODB_WD/bin/mongod --dbpath ${PWD}/$MONGODB_WD/data --logpath ${PWD}/$MONGODB_WD/mongodb.log --fork
-          ${PWD}/$MONGODB_WD/bin/mongo scoring --eval 'db.createUser({user:"test_user",pwd:"test",roles:[{role:"readWrite",db:"scoring"}]});'
-          ${PWD}/$MONGODB_WD/bin/mongo input_config --eval 'db.createUser({user:"test_user",pwd:"test",roles:[{role:"readWrite",db:"input_config"}]});'  
-        env:
-          MONGODB_WD: mongodb-linux-x86_64-ubuntu1804-4.2.19
-          MONGODB_HOST: 127.0.0.1:27017
-          SCORINGSERVICE_MONGO_USER: test_user
-          SCORINGSERVICE_MONGO_PWD: test
-          SCORING_MONGO_AUTHENTICATION: ?authenticationMechanism=MONGODB-CR
-          INPUTCONFIGSERVICE_MONGO_USER: test_user
-          INPUTCONFIGSERVICE_MONGO_PWD: test
-          INPUTCONFIGSERVICE_MONGO_AUTHENTICATION: ?authenticationMechanism= MONGODB-CR
-          MONGODB_ARCHIVE: mongodb-linux-x86_64-ubuntu1804-4.2.19.tgz
-    outputs:
-      scala_version: ${{ steps.branch_check.outputs.scala_version }}
-      new_tag: ${{ steps.gen_tag.outputs.tag }}
-      repo_name: ${{ steps.gen_tag.outputs.repo_name }}
-      app_name: ${{ steps.gen_tag.outputs.app_name }}
-      env_name: ${{ steps.branch_check.outputs.env_name }}
-      DOCKER_TAG: ${{ steps.gen_tag.outputs.tag }}
-      GITHUB_COMMIT: $GITHUB_SHA
-      GITHUB_BUILD_NUMBER: $GITHUB_RUN_NUMBER
         
 
-  ReusableWorkflow:
-    needs: [Docker-Build-and-Deploy]
-    uses: avetta/github-reusable-workflows/.github/workflows/java.yml@main # Uses an action in the root directory
-    with:
-      scala_version: ${{needs.Docker-Build-and-Deploy.outputs.scala_version}}
-      git_user: avettabot
-      image_tag: ${{needs.Docker-Build-and-Deploy.outputs.new_tag}}
-      app_name: ${{needs.Docker-Build-and-Deploy.outputs.app_name}}
-      environment: ${{needs.Docker-Build-and-Deploy.outputs.env_name}}
-      jenkins_user: avettajenkins
-      embed_apm: false
-      DOCKER_TAG: ${{needs.Docker-Build-and-Deploy.outputs.DOCKER_TAG}}
-      GITHUB_COMMIT: ${{needs.Docker-Build-and-Deploy.outputs.GITHUB_COMMIT}}
-      GITHUB_BUILD_NUMBER: ${{needs.Docker-Build-and-Deploy.outputs.GITHUB_BUILD_NUMBER}}
-      
-    secrets:
-      git_password: ${{secrets.GH_TOKEN}}
-      DOCKER_USERNAME: ${{secrets.DOCKER_USERNAME}}
-      DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
-      jenkins_url: ${{secrets.JENKINS_URL}}
-      jenkins_password: ${{secrets.AVETTAJENKINS_GITHUB_TOKEN}}
-      JFROG_USERNAME: ${{secrets.JFROG_USERNAME}}
-      JFROG_PASSWORD: ${{secrets.JFROG_PASSWORD}}
+          
+      - name: Trigger your-awesome-job-name job
+        if: "${{ steps.setversion.outputs.embed_apm != 'false' &&  github.event_name != 'pull_request'}}"
+        run: |  
+          environment=${{inputs.environment}}
+          if [ -z $environment ]; then
+            echo "Deployment configuration not found"
+          else
+            curl ${{secrets.jenkins_url}}/job/${{inputs.environment}}-deploy-generic/buildWithParameters \
+             --user ${{inputs.jenkins_user}}:${{secrets.jenkins_password}} \
+             --data ContainerName=${{inputs.app_name}} --data DockerHubTag=${{inputs.image_tag}}
+          fi
