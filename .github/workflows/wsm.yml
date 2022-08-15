@@ -122,7 +122,7 @@ jobs:
               echo "File $propertiesFile exists."
             else
               echo "File $propertiesFile does not exist. Creating conf directory"
-              mkdir ./conf
+              #mkdir ./conf
             fi
             # Update $propertiesFile
             echo "Writing commit ID and build # to conf files."
