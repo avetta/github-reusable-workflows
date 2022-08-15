@@ -52,11 +52,7 @@ on:
       jenkins_url:
         required: true   
       jenkins_password:
-        required: true
-      JFROG_USERNAME:
-        required: true
-      JFROG_PASSWORD:
-        required: true  
+        required: true 
         
 jobs:
   build-and-push-docker-image:
