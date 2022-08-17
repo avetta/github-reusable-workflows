@@ -54,6 +54,10 @@ on:
         description: Jenkins user
         required: false
         type: string
+      gc:
+        description: Jenkins user
+        required: false
+        type: string  
       docker_context:
         description: Jenkins user
         required: false
@@ -92,7 +96,9 @@ jobs:
       - name: setting values for steps
         id: values
         run: |
-          echo '::set-output name=am::'${{inputs.am}}  
+          echo '::set-output name=ui::'${{inputs.ui}} 
+          echo '::set-output name=am::'${{inputs.am}}
+          echo '::set-output name=gc::'${{inputs.gc}}
           
       - name: Setup Java and Scala
         if: "${{ steps.values.outputs.am == 'true'}}"
@@ -140,7 +146,7 @@ jobs:
           npx elm-format src --validate
           npm run build
           
-      - name: Check that workflows are up to date 
+      - name: code coverage and stage docker file 
         if: "${{ steps.values.outputs.am == 'true'}}"
         run: |
           export JFROG_USER=${{secrets.JFROG_USERNAME}}
@@ -149,7 +155,18 @@ jobs:
           export JFROG_RO_PASSWORD=${{secrets.JFROG_PASSWORD}}
           sbt ++${{inputs.scala_version}} clean coverage compile test
           sbt ++${{inputs.scala_version}} coverageReport
-          sbt docker:stage    
+          sbt docker:stage 
+          
+      - name: code coverage and stage docker file 
+        if: "${{ steps.values.outputs.gc == 'true'}}"
+        run: |
+          export JFROG_USER=${{secrets.JFROG_USERNAME}}
+          export JFROG_PASSWORD=${{secrets.JFROG_PASSWORD}}
+          export JFROG_RO_USER=${{secrets.JFROG_USERNAME}}
+          export JFROG_RO_PASSWORD=${{secrets.JFROG_PASSWORD}}
+          sbt ++${{inputs.scala_version}} clean coverage compile test
+          sbt ++${{inputs.scala_version}} coverageReport
+          sbt docker:stage     
           
       - name: Login to DockerHub
         uses: docker/login-action@v1
