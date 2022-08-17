@@ -328,7 +328,7 @@ jobs:
           context: .
           push: true
            # Note: tags has to be all lower-case
-          tags: pics/${{inputs.app_name}}:${{inputs.image_tag}}
+          tags: pics/${{inputs.app_name}}:${{inputs.tag_name}}
           
       - name: Run nom test
         if: "${{ steps.values.outputs.ghql == 'true'}}"
