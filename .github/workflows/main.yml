@@ -11,12 +11,12 @@ on:
         default: 'latest'
       scala_version:
         description: Image tag of the docker image
-        required: true
+        required: false
         type: string
         default: 'latest' 
       node_version:
         description: Image tag of the docker image
-        required: true
+        required: false
         type: string
         default: 'latest'  
       git_user:
@@ -53,7 +53,7 @@ on:
         type: string 
       embed_apm:
         description: Jenkins user
-        required: false
+        required: true
         type: string
       am:
         description: Jenkins user
