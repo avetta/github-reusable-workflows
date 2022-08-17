@@ -5,12 +5,12 @@ on:
   workflow_call:
     inputs:
       scala_version:
-        description: Image tag of the docker image
+        description: scala version
         required: false
         type: string
         default: 'latest' 
       node_version:
-        description: Image tag of the docker image
+        description: node_version
         required: false
         type: string
         default: 'latest'  
@@ -23,15 +23,15 @@ on:
         required: true
         type: string
       branch_name:
-        description: Environment to be update
+        description: branch_name
         required: true
         type: string
       docker_tag:
-        description: Environment to be update
+        description: docker_tag
         required: true
         type: string 
       github_tag:
-        description: Environment to be update
+        description: github_tag
         required: false
         type: string  
       jenkins_user:
@@ -39,47 +39,55 @@ on:
         required: true
         type: string
       GITHUB_COMMIT:
-        description: Jenkins user
+        description: commit id
         required: true
         type: string
       GITHUB_BUILD_NUMBER:
-        description: Jenkins user
+        description: github build number
         required: true
         type: string 
       embed_apm:
-        description: Jenkins user
+        description: embed_apm
         required: false
         type: string
-      am:
-        description: Jenkins user
+      java:
+        description: java
         required: false
         type: string 
       ui:
-        description: Jenkins user
+        description: ui
         required: false
         type: string
-      gc:
-        description: Jenkins user
+      npm_test:
+        description: npm_test
         required: false
         type: string 
-      ghql:
-        description: Jenkins user
+      docker_stage:
+        description: docker_stage
         required: false
-        type: string 
-      java:
-        description: Jenkins user
+        type: string
+      code_coverage:
+        description: code_coverage
         required: false
-        type: string 
-      jobservice:
-        description: Jenkins user
+        type: string
+      cache_sbt:
+        description: cache_sbt
         required: false
-        type: string  
+        type: string   
       docker_context:
-        description: Jenkins user
+        description: docker file path
         required: false
         type: string
       stage_value:
-        description: Jenkins user
+        description: docker stage_value
+        required: false
+        type: string  
+      clean_coverage:
+        description: clean_coverage
+        required: false
+        type: string 
+      coverage_report:
+        description: coverage_report
         required: false
         type: string   
         
@@ -105,7 +113,6 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [14.17.6]
         java: [adopt@1.8]
 
     steps:
@@ -124,6 +131,7 @@ jobs:
           echo '::set-output name=jobservice::'${{inputs.jobservice}}
           echo '::set-output name=branch_name::'${{inputs.branch_name}}
           echo '::set-output name=github_tag::'${{inputs.github_tag}}
+          echo '::set-output name=github_tag::'${{inputs.java}}
           
       - name: Some check on branch
         id: branch_check
@@ -148,7 +156,7 @@ jobs:
           fi    
           
       - name: Setup Java and Scala
-        if: "${{ steps.values.outputs.am == 'true'}}"
+        if: "${{ steps.values.outputs.java == 'true'}}"
         uses: olafurpg/setup-scala@v10
         with:
           java-version: ${{ matrix.java }}    
@@ -169,7 +177,7 @@ jobs:
           key: node-modules-${{ hashFiles('package-lock.json') }}
           
       - name: Cache sbt
-        if: "${{ steps.values.outputs.am == 'true'}}"
+        if: "${{ steps.values.outputs.cache_sbt == 'true'}}"
         uses: actions/cache@v2
         with:
           path: |
@@ -194,26 +202,17 @@ jobs:
           npm run build
           
       - name: code coverage and stage docker file 
-        if: "${{ steps.values.outputs.am == 'true'}}"
+        if: "${{ steps.values.outputs.code_coverage == 'true'}}"
         run: |
           export JFROG_USER=${{secrets.JFROG_USERNAME}}
           export JFROG_PASSWORD=${{secrets.JFROG_PASSWORD}}
           export JFROG_RO_USER=${{secrets.JFROG_USERNAME}}
           export JFROG_RO_PASSWORD=${{secrets.JFROG_PASSWORD}}
-          sbt ++${{inputs.scala_version}} clean coverage compile test
-          sbt ++${{inputs.scala_version}} coverageReport
-          
-      - name: code coverage and stage docker file 
-        if: "${{ steps.values.outputs.gc == 'true'}}"
-        run: |
-          export JFROG_USER=${{secrets.JFROG_USERNAME}}
-          export JFROG_PASSWORD=${{secrets.JFROG_PASSWORD}}
-          export JFROG_RO_USER=${{secrets.JFROG_USERNAME}}
-          export JFROG_RO_PASSWORD=${{secrets.JFROG_PASSWORD}}
-          sbt ++${{inputs.scala_version}} clean coverage test coverageReport
+          ${{inputs.clean_coverage}}
+          ${{inputs.coverage_report}}
           
       - name: code coverage and stage docker file
-        if: "${{ steps.values.outputs.dockerstage == 'true'}}"
+        if: "${{ steps.values.outputs.docker_stage == 'true'}}"
         run: |
           export JFROG_USER=${{secrets.JFROG_USERNAME}}
           export JFROG_PASSWORD=${{secrets.JFROG_PASSWORD}}
@@ -304,8 +303,8 @@ jobs:
            # Note: tags has to be all lower-case
           tags: pics/${{inputs.app_name}}:${{inputs.docker_tag}}
           
-      - name: Run nom test
-        if: "${{ steps.values.outputs.ghql == 'true'}}"
+      - name: Run npm test
+        if: "${{ steps.values.outputs.npm_test == 'true'}}"
         run: |
           npm install
           npm run test
