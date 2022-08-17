@@ -27,10 +27,14 @@ on:
         description: App name to be update
         required: true
         type: string
-      environment:
+      branch_name:
         description: Environment to be update
         required: true
         type: string
+      tag_name:
+        description: Environment to be update
+        required: true
+        type: string  
       jenkins_user:
         description: Jenkins user
         required: true
@@ -112,7 +116,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 0
+          fetch-depth: 0    
           
       - name: setting values for steps
         id: values
@@ -123,6 +127,30 @@ jobs:
           echo '::set-output name=ghql::'${{inputs.ghql}}
           echo '::set-output name=java::'${{inputs.java}}
           echo '::set-output name=jobservice::'${{inputs.jobservice}}
+          echo '::set-output name=branch_name::'${{inputs.branch_name}}
+          echo '::set-output name=tag_name::'${{inputs.tag_name}}
+          
+      - name: Some check on branch
+        id: branch_check
+        run: |
+          if [ -z "${{ steps.values.outputs.tag }}" ]
+          then
+                echo "\${{ steps.values.outputs.tag }} is empty"
+          else
+                echo "::set-output name=env_name::qa"
+          fi
+          if [ "${{ steps.values.outputs.branch_name }}" = "feature" ]; then
+            echo "::set-output name=env_name::dev"
+          fi
+          if [ "${{ steps.values.outputs.branch_name }}" = "nightly" ]; then
+            echo "::set-output name=env_name::int"
+          fi
+          if [ "${{ steps.values.outputs.branch_name }}" = "release" ]; then
+            echo "::set-output name=env_name::qa"
+          fi
+          if [ "${{ steps.values.outputs.branch_name }}" = "patch" ]; then
+            echo "::set-output name=env_name::qa"
+          fi    
           
       - name: Setup Java and Scala
         if: "${{ steps.values.outputs.am == 'true'}}"
@@ -315,7 +343,7 @@ jobs:
           if [ -z $environment ]; then
             echo "Deployment configuration not found"
           else
-            curl ${{secrets.jenkins_url}}/job/${{inputs.environment}}-deploy-generic/buildWithParameters \
+            curl ${{secrets.jenkins_url}}/job/${{ steps.branch_check.outputs.env_name }}-deploy-generic/buildWithParameters \
              --user ${{inputs.jenkins_user}}:${{secrets.jenkins_password}} \
              --data ContainerName=${{inputs.app_name}} --data DockerHubTag=${{inputs.image_tag}}
           fi    
