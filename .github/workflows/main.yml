@@ -128,14 +128,15 @@ jobs:
         id: values
         run: |
           echo '::set-output name=ui::'${{inputs.ui}} 
-          echo '::set-output name=am::'${{inputs.am}}
-          echo '::set-output name=gc::'${{inputs.gc}}
-          echo '::set-output name=ghql::'${{inputs.ghql}}
           echo '::set-output name=java::'${{inputs.java}}
           echo '::set-output name=jobservice::'${{inputs.jobservice}}
           echo '::set-output name=branch_name::'${{inputs.branch_name}}
           echo '::set-output name=github_tag::'${{inputs.github_tag}}
           echo '::set-output name=github_tag::'${{inputs.java}}
+          echo '::set-output name=github_tag::'${{inputs.docker_stage}}
+          echo '::set-output name=github_tag::'${{inputs.code_coverage}}
+          echo '::set-output name=github_tag::'${{inputs.npm_test}}
+          echo '::set-output name=github_tag::'${{inputs.cache_sbt}}
           
       - name: Some check on branch
         id: branch_check
