@@ -61,6 +61,14 @@ on:
       ghql:
         description: Jenkins user
         required: false
+        type: string 
+      java:
+        description: Jenkins user
+        required: false
+        type: string 
+      jobservice:
+        description: Jenkins user
+        required: false
         type: string  
       docker_context:
         description: Jenkins user
@@ -108,6 +116,8 @@ jobs:
           echo '::set-output name=am::'${{inputs.am}}
           echo '::set-output name=gc::'${{inputs.gc}}
           echo '::set-output name=ghql::'${{inputs.ghql}}
+          echo '::set-output name=java::'${{inputs.java}}
+          echo '::set-output name=jobservice::'${{inputs.jobservice}}
           
       - name: Setup Java and Scala
         if: "${{ steps.values.outputs.am == 'true'}}"
@@ -174,7 +184,35 @@ jobs:
           export JFROG_RO_USER=${{secrets.JFROG_USERNAME}}
           export JFROG_RO_PASSWORD=${{secrets.JFROG_PASSWORD}}
           sbt ++${{inputs.scala_version}} clean coverage test coverageReport
-          sbt docker:stage     
+          sbt docker:stage 
+          
+      - name: code coverage and stage docker file 
+        if: "${{ steps.values.outputs.java == 'true'}}"
+        run: |
+          export JFROG_USER=${{secrets.JFROG_USERNAME}}
+          export JFROG_PASSWORD=${{secrets.JFROG_PASSWORD}}
+          export JFROG_RO_USER=${{secrets.JFROG_USERNAME}}
+          export JFROG_RO_PASSWORD=${{secrets.JFROG_PASSWORD}}
+          sbt ++${{inputs.scala_version}} clean coverage test it:test coverageReport
+          sbt docker:stage
+          
+      - name: code coverage and stage docker file 
+        if: "${{ steps.values.outputs.jobservice == 'true'}}"
+        run: |
+          export JFROG_USER=${{secrets.JFROG_USERNAME}}
+          export JFROG_PASSWORD=${{secrets.JFROG_PASSWORD}}
+          export JFROG_RO_USER=${{secrets.JFROG_USERNAME}}
+          export JFROG_RO_PASSWORD=${{secrets.JFROG_PASSWORD}}
+          sbt jobRunner/docker:stage 
+          
+      - name: code coverage and stage docker file
+        run: |
+          export JFROG_USER=${{secrets.JFROG_USERNAME}}
+          export JFROG_PASSWORD=${{secrets.JFROG_PASSWORD}}
+          export JFROG_RO_USER=${{secrets.JFROG_USERNAME}}
+          export JFROG_RO_PASSWORD=${{secrets.JFROG_PASSWORD}}
+          sbt docker:stage
+    
           
       - name: Login to DockerHub
         uses: docker/login-action@v1
