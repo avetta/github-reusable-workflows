@@ -100,9 +100,9 @@ on:
       jenkins_password:
         required: true 
       JFROG_USERNAME:
-        required: true
+        required: false
       JFROG_PASSWORD:
-        required: true    
+        required: false    
         
 jobs:
   build-and-push-docker-image:
