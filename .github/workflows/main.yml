@@ -132,11 +132,11 @@ jobs:
           echo '::set-output name=jobservice::'${{inputs.jobservice}}
           echo '::set-output name=branch_name::'${{inputs.branch_name}}
           echo '::set-output name=github_tag::'${{inputs.github_tag}}
-          echo '::set-output name=github_tag::'${{inputs.java}}
-          echo '::set-output name=github_tag::'${{inputs.docker_stage}}
-          echo '::set-output name=github_tag::'${{inputs.code_coverage}}
-          echo '::set-output name=github_tag::'${{inputs.npm_test}}
-          echo '::set-output name=github_tag::'${{inputs.cache_sbt}}
+          echo '::set-output name=java::'${{inputs.java}}
+          echo '::set-output name=docker_stage::'${{inputs.docker_stage}}
+          echo '::set-output name=code_coverage::'${{inputs.code_coverage}}
+          echo '::set-output name=npm_test::'${{inputs.npm_test}}
+          echo '::set-output name=cache_sbt::'${{inputs.cache_sbt}}
           
       - name: Some check on branch
         id: branch_check
