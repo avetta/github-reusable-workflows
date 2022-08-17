@@ -293,7 +293,7 @@ jobs:
           context: ${{inputs.docker_context}}
           push: true
            # Note: tags has to be all lower-case
-          tags: pics/${{inputs.app_name}}:${{inputs.image_tag}}
+          tags: pics/${{inputs.app_name}}:${{inputs.tag_name}}
           
       - name: Build image
         if: "${{ steps.setversion.outputs.embed_apm == 'true' &&  github.event_name != 'pull_request'}}"
@@ -304,7 +304,7 @@ jobs:
           context: ${{inputs.docker_context}}
           push: false
            # Note: tags has to be all lower-case
-          tags: pics/${{inputs.app_name}}:${{inputs.image_tag}}    
+          tags: pics/${{inputs.app_name}}:${{inputs.tag_name}}    
           
       
       - name: EmbedAPM        
