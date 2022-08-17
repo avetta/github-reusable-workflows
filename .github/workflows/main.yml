@@ -13,6 +13,11 @@ on:
         description: Image tag of the docker image
         required: true
         type: string
+        default: 'latest' 
+      node_version:
+        description: Image tag of the docker image
+        required: true
+        type: string
         default: 'latest'  
       git_user:
         description: username to access github repo
@@ -125,11 +130,11 @@ jobs:
         with:
           java-version: ${{ matrix.java }}    
 
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js ${{inputs.node-version}}
         if: "${{ steps.values.outputs.ui == 'true'}}"
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: ${{inputs.node-version}}
           cache: 'npm'
           
       - name: Cache Node Modules
