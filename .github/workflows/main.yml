@@ -154,6 +154,7 @@ jobs:
           password: ${{secrets.DOCKER_PASSWORD}}
           
       - name: set version files
+        id: setversion
         run: |
           # Check if $propertiesFile file exists. If not, create file
             export conf="./conf"
