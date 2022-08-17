@@ -49,7 +49,11 @@ on:
       am:
         description: Jenkins user
         required: false
-        type: string  
+        type: string 
+      ui:
+        description: Jenkins user
+        required: false
+        type: string   
         
     secrets:
       git_password:
@@ -152,12 +156,12 @@ jobs:
       - name: set version files
         run: |
           # Check if $propertiesFile file exists. If not, create file
-            export propertiesFile="./conf/serviceVersion.properties"
-            if [ -f $propertiesFile ];
+            export conf="./conf"
+            if [ -d $conf ];
             then
-              echo "File $propertiesFile exists."
+              echo "File $conf exists."
             else
-              echo "File $propertiesFile does not exist. Creating conf directory"
+              echo "File $conf does not exist. Creating conf directory"
               mkdir ./conf
             fi
 
