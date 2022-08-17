@@ -4,11 +4,6 @@ name: 'Custom Github Action to Update Deployment YAML files'
 on:
   workflow_call:
     inputs:
-      image_tag:
-        description: Image tag of the docker image
-        required: true
-        type: string
-        default: 'latest'
       scala_version:
         description: Image tag of the docker image
         required: false
@@ -31,15 +26,15 @@ on:
         description: Environment to be update
         required: true
         type: string
-      tag_name:
+      docker_tag:
         description: Environment to be update
         required: true
+        type: string 
+      github_tag:
+        description: Environment to be update
+        required: false
         type: string  
       jenkins_user:
-        description: Jenkins user
-        required: true
-        type: string
-      DOCKER_TAG:
         description: Jenkins user
         required: true
         type: string
@@ -129,13 +124,14 @@ jobs:
           echo '::set-output name=jobservice::'${{inputs.jobservice}}
           echo '::set-output name=branch_name::'${{inputs.branch_name}}
           echo '::set-output name=tag_name::'${{inputs.tag_name}}
+          echo '::set-output name=github_tag::'${{inputs.github_tag}}
           
       - name: Some check on branch
         id: branch_check
         run: |
-          if [ -z "${{ steps.values.outputs.tag }}" ]
+          if [ -z "${{ steps.values.outputs.github_tag }}" ]
           then
-                echo "\${{ steps.values.outputs.tag }} is empty"
+                echo "\${{ steps.values.outputs.github_tag }} is empty"
           else
                 echo "::set-output name=env_name::qa"
           fi
@@ -186,7 +182,7 @@ jobs:
             ~/Library/Caches/Coursier/v1
           key: ${{ runner.os }}-sbt-cache-v2-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('project/build.properties') }}    
           
-      - name: Install Dependencies
+      - name: npm install
         if: "${{ steps.cache.outputs.cache-hit != 'true' &&  steps.values.outputs.ui == 'true'}}"
         run: npm install
 
@@ -272,7 +268,7 @@ jobs:
           context: ${{inputs.docker_context}}
           push: true
            # Note: tags has to be all lower-case
-          tags: pics/${{inputs.app_name}}:${{inputs.tag_name}}
+          tags: pics/${{inputs.app_name}}:${{inputs.docker_tag}}
           
       - name: Build image
         if: "${{ steps.setversion.outputs.embed_apm == 'true' &&  github.event_name != 'pull_request'}}"
@@ -283,7 +279,7 @@ jobs:
           context: ${{inputs.docker_context}}
           push: false
            # Note: tags has to be all lower-case
-          tags: pics/${{inputs.app_name}}:${{inputs.tag_name}}    
+          tags: pics/${{inputs.app_name}}:${{inputs.docker_tag}}    
           
       
       - name: EmbedAPM        
@@ -307,7 +303,7 @@ jobs:
           context: .
           push: true
            # Note: tags has to be all lower-case
-          tags: pics/${{inputs.app_name}}:${{inputs.tag_name}}
+          tags: pics/${{inputs.app_name}}:${{inputs.docker_tag}}
           
       - name: Run nom test
         if: "${{ steps.values.outputs.ghql == 'true'}}"
