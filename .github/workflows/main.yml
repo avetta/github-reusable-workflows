@@ -308,7 +308,7 @@ jobs:
           
       
       - name: EmbedAPM        
-        if: "${{ steps.setversion.outputs.embed_apm != 'false' &&  github.event_name != 'pull_request'}}"
+        if: "${{ steps.setversion.outputs.embed_apm == 'true' &&  github.event_name != 'pull_request'}}"
         run: |
           curl https://download.newrelic.com/newrelic/java-agent/newrelic-agent/7.5.0/newrelic-java-7.5.0.zip --output newrelic-java-7.5.0.zip
           unzip newrelic-java-7.5.0.zip
@@ -320,7 +320,7 @@ jobs:
           ls -ltr
       
       - name: Build image and push to DockerHub
-        if: "${{ steps.setversion.outputs.embed_apm != 'false' &&  github.event_name != 'pull_request'}}"
+        if: "${{ steps.setversion.outputs.embed_apm == 'true' &&  github.event_name != 'pull_request'}}"
         id: docker_build_push
         uses: docker/build-push-action@v2
         with:
