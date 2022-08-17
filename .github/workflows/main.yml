@@ -239,6 +239,7 @@ jobs:
           sbt jobRunner/docker:stage 
           
       - name: code coverage and stage docker file
+        if: "${{ steps.values.outputs.jobservice == 'true'}}"
         run: |
           export JFROG_USER=${{secrets.JFROG_USERNAME}}
           export JFROG_PASSWORD=${{secrets.JFROG_PASSWORD}}
