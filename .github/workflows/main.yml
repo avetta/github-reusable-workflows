@@ -78,6 +78,10 @@ on:
         description: docker file path
         required: false
         type: string
+      docker_run:
+        description: docker_run
+        required: false
+        type: string  
       stage_value:
         description: docker stage_value
         required: false
