@@ -57,11 +57,19 @@ on:
       gc:
         description: Jenkins user
         required: false
+        type: string 
+      ghql:
+        description: Jenkins user
+        required: false
         type: string  
       docker_context:
         description: Jenkins user
         required: false
-        type: string  
+        type: string
+      stage_value:
+        description: Jenkins user
+        required: false
+        type: string   
         
     secrets:
       git_password:
@@ -99,6 +107,7 @@ jobs:
           echo '::set-output name=ui::'${{inputs.ui}} 
           echo '::set-output name=am::'${{inputs.am}}
           echo '::set-output name=gc::'${{inputs.gc}}
+          echo '::set-output name=ghql::'${{inputs.ghql}}
           
       - name: Setup Java and Scala
         if: "${{ steps.values.outputs.am == 'true'}}"
@@ -155,7 +164,7 @@ jobs:
           export JFROG_RO_PASSWORD=${{secrets.JFROG_PASSWORD}}
           sbt ++${{inputs.scala_version}} clean coverage compile test
           sbt ++${{inputs.scala_version}} coverageReport
-          sbt docker:stage 
+          sbt docker:stage ++${{inputs.stage_value}}
           
       - name: code coverage and stage docker file 
         if: "${{ steps.values.outputs.gc == 'true'}}"
@@ -248,6 +257,13 @@ jobs:
           push: true
            # Note: tags has to be all lower-case
           tags: pics/${{inputs.app_name}}:${{inputs.image_tag}}
+          
+      - name: Run nom test
+        if: "${{ steps.values.outputs.ghql == 'true'}}"
+        run: |
+          npm install
+          npm run test
+          npm prune --production     
               
       - name: Trigger your-awesome-job-name job
         if: github.event_name != 'pull_request'
