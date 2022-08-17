@@ -166,6 +166,7 @@ jobs:
             fi
 
             # Update $propertiesFile
+            export propertiesFile="./conf/serviceVersion.properties"
             echo "Writing commit ID and build # to conf files."
             echo "tag=${{inputs.DOCKER_TAG}}" | sudo tee -a $propertiesFile
             echo "commit=${{inputs.GITHUB_COMMIT}}" | sudo tee -a $propertiesFile
