@@ -123,7 +123,6 @@ jobs:
           echo '::set-output name=java::'${{inputs.java}}
           echo '::set-output name=jobservice::'${{inputs.jobservice}}
           echo '::set-output name=branch_name::'${{inputs.branch_name}}
-          echo '::set-output name=tag_name::'${{inputs.tag_name}}
           echo '::set-output name=github_tag::'${{inputs.github_tag}}
           
       - name: Some check on branch
@@ -321,7 +320,7 @@ jobs:
           else
             curl ${{secrets.jenkins_url}}/job/${{ steps.branch_check.outputs.env_name }}-deploy-generic/buildWithParameters \
              --user ${{inputs.jenkins_user}}:${{secrets.jenkins_password}} \
-             --data ContainerName=${{inputs.app_name}} --data DockerHubTag=${{inputs.image_tag}}
+             --data ContainerName=${{inputs.app_name}} --data DockerHubTag=${{inputs.docker_tag}}
           fi    
           
  
