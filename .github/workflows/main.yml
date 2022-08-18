@@ -232,7 +232,7 @@ jobs:
           #${PWD}/${{secrets.MONGODB_WD}}/bin/mongo scoring --eval 'db.createUser({user:"${{secrets.INPUTCONFIGSERVICE_MONGO_USER}}",pwd:"${{secrets.INPUTCONFIGSERVICE_MONGO_PWD}}",roles:[{role:"readWrite",db:"scoring"}]});'
           #${PWD}/${{secrets.MONGODB_WD}}/bin/mongo input_config --eval 'db.createUser({user:"${{secrets.INPUTCONFIGSERVICE_MONGO_USER}}",pwd:"${{secrets.INPUTCONFIGSERVICE_MONGO_PWD}}",roles:[{role:"readWrite",db:"input_config"}]});'
           ${PWD}/${{secrets.MONGODB_WD}}/bin/mongod --replSet rs0 --dbpath ${PWD}/${{secrets.MONGODB_WD}}/data --logpath ${PWD}/${{secrets.MONGODB_WD}}/mongodb.log --fork
-          ${PWD}/${{secrets.MONGODB_WD}}/bin/mongo --eval 'rsconf = {_id:"rs0", members:[{ _id:0, host:"localhost:27017" }]}; rs.initiate( rsconf )    
+          ${PWD}/${{secrets.MONGODB_WD}}/bin/mongo --eval 'rsconf = {_id:"rs0", members:[{ _id:0, host:"localhost:27017" }]}; rs.initiate( rsconf )'
           
       - name: npm install
         if: "${{ steps.cache.outputs.cache-hit != 'true' &&  steps.values.outputs.ui == 'true'}}"
