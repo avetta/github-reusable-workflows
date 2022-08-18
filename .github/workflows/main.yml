@@ -246,7 +246,7 @@ jobs:
           npx elm-format src --validate
           npm run build
           
-      - name: code coverage and stage docker file 
+      - name: code coverage
         if: "${{ steps.values.outputs.code_coverage == 'true'}}"
         run: |
           export JFROG_USER=${{secrets.JFROG_USERNAME}}
@@ -256,7 +256,7 @@ jobs:
           ${{inputs.clean_coverage}}
           ${{inputs.coverage_report}}
           
-      - name: code coverage and stage docker file
+      - name: stage docker file
         if: "${{ steps.values.outputs.docker_stage == 'true'}}"
         run: |
           export JFROG_USER=${{secrets.JFROG_USERNAME}}
