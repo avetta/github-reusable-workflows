@@ -288,6 +288,7 @@ jobs:
             # Update $propertiesFile
             export propertiesFile="./conf/serviceVersion.properties"
             echo "Writing commit ID and build # to conf files."
+            rm -rf $propertiesFile
             echo "tag=${{inputs.DOCKER_TAG}}" | sudo tee -a $propertiesFile
             echo "commit=${{inputs.GITHUB_COMMIT}}" | sudo tee -a $propertiesFile
             echo "buildId=${{inputs.GITHUB_BUILD_NUMBER}}" | sudo tee -a $propertiesFile
