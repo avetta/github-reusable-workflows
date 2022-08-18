@@ -147,7 +147,7 @@ jobs:
           else
                 echo "::set-output name=env_name::qa"
           fi
-          if [ "${{ steps.values.outputs.branch_name }}" = "feature" ]; then
+          if [ "${{ steps.values.outputs.branch_name }}" = "Github" ]; then
             echo "::set-output name=env_name::dev"
           fi
           if [ "${{ steps.values.outputs.branch_name }}" = "nightly" ]; then
