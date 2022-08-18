@@ -300,6 +300,7 @@ jobs:
             echo "Checking parameter values in $propertiesFile"
             echo "Parameters in $propertiesFile"
             cat $propertiesFile  
+            ls -ltr ./conf
             echo ${{inputs.embed_apm}}
             echo '::set-output name=embed_apm::'${{inputs.embed_apm}}
           
