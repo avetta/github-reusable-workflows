@@ -116,7 +116,7 @@ on:
       JFROG_PASSWORD:
         required: false
       MONGODB_WD:
-        required: true
+        required: false
       MONGODB_HOST:
         required: false  
       SCORINGSERVICE_MONGO_USER:
