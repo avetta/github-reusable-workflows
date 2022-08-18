@@ -158,7 +158,8 @@ jobs:
           fi
           if [ "${{ steps.values.outputs.branch_name }}" = "patch" ]; then
             echo "::set-output name=env_name::qa"
-          fi    
+          fi 
+            
           
       - name: Setup Java and Scala
         if: "${{ steps.values.outputs.java == 'true'}}"
@@ -318,7 +319,7 @@ jobs:
       - name: Trigger your-awesome-job-name job
         if: github.event_name != 'pull_request'
         run: |  
-          environment=${{inputs.environment}}
+          environment=${{ steps.branch_check.outputs.env_name }}
           if [ -z $environment ]; then
             echo "Deployment configuration not found"
           else
