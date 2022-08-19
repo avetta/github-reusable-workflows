@@ -165,7 +165,7 @@ jobs:
           echo '::set-output name=npm_test::'${{inputs.npm_test}}
           echo '::set-output name=cache_sbt::'${{inputs.cache_sbt}}
           echo '::set-output name=mondb_wd::'${{inputs.mondb_wd}}
-          echo '::set-output name=mondb_wd::'${{inputs.mondb_wd_scoring}}
+          echo '::set-output name=mondb_wd_scoring::'${{inputs.mondb_wd_scoring}}
           
       - name: Some check on branch
         id: branch_check
