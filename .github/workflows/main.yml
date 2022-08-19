@@ -274,22 +274,6 @@ jobs:
           ${{inputs.clean_coverage}}
           ${{inputs.coverage_report}}
           
-      - name: stage docker file
-        if: "${{ steps.values.outputs.docker_stage == 'true'}}"
-        run: |
-          export JFROG_USER=${{secrets.JFROG_USERNAME}}
-          export JFROG_PASSWORD=${{secrets.JFROG_PASSWORD}}
-          export JFROG_RO_USER=${{secrets.JFROG_USERNAME}}
-          export JFROG_RO_PASSWORD=${{secrets.JFROG_PASSWORD}}
-          ${{inputs.docker_run}}
-    
-          
-      - name: Login to DockerHub
-        uses: docker/login-action@v1
-        with:
-          username: ${{secrets.DOCKER_USERNAME}}
-          password: ${{secrets.DOCKER_PASSWORD}}
-          
       - name: set version files
         id: setversion
         run: |
@@ -320,8 +304,24 @@ jobs:
             cat $propertiesFile  
             ls -ltr ./conf
             echo ${{inputs.embed_apm}}
-            echo '::set-output name=embed_apm::'${{inputs.embed_apm}}
+            echo '::set-output name=embed_apm::'${{inputs.embed_apm}}    
           
+      - name: stage docker file
+        if: "${{ steps.values.outputs.docker_stage == 'true'}}"
+        run: |
+          export JFROG_USER=${{secrets.JFROG_USERNAME}}
+          export JFROG_PASSWORD=${{secrets.JFROG_PASSWORD}}
+          export JFROG_RO_USER=${{secrets.JFROG_USERNAME}}
+          export JFROG_RO_PASSWORD=${{secrets.JFROG_PASSWORD}}
+          ${{inputs.docker_run}}
+    
+          
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{secrets.DOCKER_USERNAME}}
+          password: ${{secrets.DOCKER_PASSWORD}}
+              
       - name: Build image and push to DockerHub
         if: "${{ steps.setversion.outputs.embed_apm == 'false' &&  github.event_name != 'pull_request'}}"
         id: docker_build1
@@ -356,6 +356,7 @@ jobs:
           echo "ADD ./newrelic/newrelic.jar /opt/docker/lib/" | sudo tee -a $Dockerfile
           echo "ADD ./newrelic/newrelic.yml /opt/docker/lib/" | sudo tee -a $Dockerfile
           ls -ltr
+          cat ./conf/serviceVersion.properties
       
       - name: Build image and push to DockerHub
         if: "${{ steps.setversion.outputs.embed_apm == 'true' &&  github.event_name != 'pull_request'}}"
