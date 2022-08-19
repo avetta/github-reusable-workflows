@@ -45,7 +45,11 @@ on:
       embed_apm:
         description: Jenkins user
         required: false
-        type: string    
+        type: string 
+      scoring_service:
+        description: Jenkins user
+        required: false
+        type: string  
         
     secrets:
       git_password:
@@ -94,6 +98,11 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
+          
+      - name: setting values for steps
+        id: values
+        run: |
+          echo '::set-output name=scoring_service::'${{inputs.scoring_service}}     
 
       - name: Setup Java and Scala
         uses: olafurpg/setup-scala@v10
@@ -125,6 +134,20 @@ jobs:
           #${PWD}/${{secrets.MONGODB_WD}}/bin/mongo input_config --eval 'db.createUser({user:"${{secrets.INPUTCONFIGSERVICE_MONGO_USER}}",pwd:"${{secrets.INPUTCONFIGSERVICE_MONGO_PWD}}",roles:[{role:"readWrite",db:"input_config"}]});'
           ${PWD}/${{secrets.MONGODB_WD}}/bin/mongod --replSet rs0 --dbpath ${PWD}/${{secrets.MONGODB_WD}}/data --logpath ${PWD}/${{secrets.MONGODB_WD}}/mongodb.log --fork
           ${PWD}/${{secrets.MONGODB_WD}}/bin/mongo --eval 'rsconf = {_id:"rs0", members:[{ _id:0, host:"localhost:27017" }]}; rs.initiate( rsconf )'   
+      
+      - name: Install Mongodb
+        if: "${{ steps.values.outputs.scoring_service == 'true'}}"
+        run: |
+          export JFROG_USER=${{secrets.JFROG_USERNAME}}
+          export JFROG_PASSWORD=${{secrets.JFROG_PASSWORD}}
+          wget https://fastdl.mongodb.org/linux/${{secrets.MONGODB_ARCHIVE}}
+          tar -zxvf ${{secrets.MONGODB_ARCHIVE}}
+          ${PWD}/${{secrets.MONGODB_WD}}/bin/mongod --version
+          mkdir ${PWD}/${{secrets.MONGODB_WD}}/data
+          ${PWD}/${{secrets.MONGODB_WD}}/bin/mongod --dbpath ${PWD}/${{secrets.MONGODB_WD}}/data --logpath ${PWD}/${{secrets.MONGODB_WD}}/mongodb.log --fork
+          ${PWD}/${{secrets.MONGODB_WD}}/bin/mongo scoring --eval 'db.createUser({user:"${{secrets.INPUTCONFIGSERVICE_MONGO_USER}}",pwd:"${{secrets.INPUTCONFIGSERVICE_MONGO_PWD}}",roles:[{role:"readWrite",db:"scoring"}]});'
+          ${PWD}/${{secrets.MONGODB_WD}}/bin/mongo input_config --eval 'db.createUser({user:"${{secrets.INPUTCONFIGSERVICE_MONGO_USER}}",pwd:"${{secrets.INPUTCONFIGSERVICE_MONGO_PWD}}",roles:[{role:"readWrite",db:"input_config"}]});'
+          
       - name: Check that workflows are up to date 
         run: |
           export JFROG_USER=${{secrets.JFROG_USERNAME}}
