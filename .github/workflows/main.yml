@@ -239,7 +239,7 @@ jobs:
           ${PWD}/${{secrets.MONGODB_WD}}/bin/mongod --replSet rs0 --dbpath ${PWD}/${{secrets.MONGODB_WD}}/data --logpath ${PWD}/${{secrets.MONGODB_WD}}/mongodb.log --fork
           ${PWD}/${{secrets.MONGODB_WD}}/bin/mongo --eval 'rsconf = {_id:"rs0", members:[{ _id:0, host:"localhost:27017" }]}; rs.initiate( rsconf )'
        
-      - name: Install Mongodb
+      - name: Install Mongodb for scoring
         if: "${{ steps.values.outputs.mondb_wd_scoring == 'true'}}"
         run: |
           export JFROG_USER=${{secrets.JFROG_USERNAME}}
