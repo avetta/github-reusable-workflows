@@ -123,8 +123,6 @@ on:
       JFROG_PASSWORD:
         required: false
       GH_TOKEN:
-        required: false
-      github_token:
         required: false  
       MONGODB_WD:
         required: false
