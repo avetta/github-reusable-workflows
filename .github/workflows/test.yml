@@ -395,19 +395,19 @@ jobs:
         with:
           repository: reponame
           token: ${{ secrets.GH_TOKEN }}
-          ref: originize_repo
+          ref: nightly
 
       - name: Update image tag in helm chart
         if: github.event_name != 'pull_request'
         uses: sivakumarvunnam/argocd-helm-update-yaml@main # Uses an action in the root directory
         id: deployment-update
         with:
-          git_user: username
+          git_user: ${{inputs.git_user}}
           git_password: ${{ secrets.GH_TOKEN }} 
           image_tag: ${{inputs.docker_tag}}
           app_name: ${{inputs.app_name}}
           environment: ${{ steps.branch_check.outputs.env_name }}
-          git_repo: reponame
-          git_branch: originize_repo    
+          git_repo: avetta/argocd-helm
+          git_branch: nightly    
           
  
