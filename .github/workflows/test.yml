@@ -393,7 +393,7 @@ jobs:
       - name: ArgoCD Repo Checkout
         uses: actions/checkout@v3
         with:
-          repository: reponame
+          repository: avetta/argocd-helm
           token: ${{ secrets.GH_TOKEN }}
           ref: nightly
 
