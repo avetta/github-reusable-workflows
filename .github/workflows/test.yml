@@ -124,6 +124,8 @@ on:
         required: false
       GH_TOKEN:
         required: false
+      github_token:
+        required: false  
       MONGODB_WD:
         required: false
       MONGODB_HOST:
@@ -414,6 +416,7 @@ jobs:
           environment: ${{ steps.branch_check.outputs.env_name }}
           git_repo: avetta/argocd-helm
           git_branch: nightly
+          github_token: ${{ secrets.GH_TOKEN }}
           
       - name: argocd sync
         shell: bash
