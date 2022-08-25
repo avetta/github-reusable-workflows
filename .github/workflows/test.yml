@@ -106,7 +106,10 @@ on:
         description: ARGOCD_PASSWORD
         required: false
         type: string
-        
+      GH_TOKEN:
+        description: ARGOCD_PASSWORD
+        required: false
+        type: string  
         
     secrets:
       git_password:
@@ -415,6 +418,7 @@ jobs:
           environment: ${{ steps.branch_check.outputs.env_name }}
           git_repo: avetta/argocd-helm
           git_branch: nightly
+          github_token: ${{ secrets.GH_TOKEN }}
           
       - name: argocd sync
         shell: bash
