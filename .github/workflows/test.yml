@@ -106,7 +106,7 @@ on:
         description: ARGOCD_PASSWORD
         required: false
         type: string
-      GH_TOKEN:
+      github_token:
         description: ARGOCD_PASSWORD
         required: false
         type: string  
