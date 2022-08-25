@@ -119,6 +119,8 @@ on:
         required: false
       JFROG_PASSWORD:
         required: false
+      GH_TOKEN:
+        required: false
       MONGODB_WD:
         required: false
       MONGODB_HOST:
@@ -376,16 +378,36 @@ jobs:
           npm run test
           npm prune --production     
               
-      - name: Trigger your-awesome-job-name job
+      #- name: Trigger your-awesome-job-name job
+       # if: github.event_name != 'pull_request'
+        #run: |  
+         # environment=${{ steps.branch_check.outputs.env_name }}
+          #if [ -z $environment ]; then
+           # echo "Deployment configuration not found"
+          #else
+           # curl ${{secrets.jenkins_url}}/job/${{ steps.branch_check.outputs.env_name }}-deploy-generic/buildWithParameters \
+            # --user ${{inputs.jenkins_user}}:${{secrets.jenkins_password}} \
+             #--data ContainerName=${{inputs.app_name}} --data DockerHubTag=${{inputs.docker_tag}}
+          #fi 
+          
+      - name: ArgoCD Repo Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: reponame
+          token: ${{ secrets.GH_TOKEN }}
+          ref: originize_repo
+
+      - name: Update image tag in helm chart
         if: github.event_name != 'pull_request'
-        run: |  
-          environment=${{ steps.branch_check.outputs.env_name }}
-          if [ -z $environment ]; then
-            echo "Deployment configuration not found"
-          else
-            curl ${{secrets.jenkins_url}}/job/${{ steps.branch_check.outputs.env_name }}-deploy-generic/buildWithParameters \
-             --user ${{inputs.jenkins_user}}:${{secrets.jenkins_password}} \
-             --data ContainerName=${{inputs.app_name}} --data DockerHubTag=${{inputs.docker_tag}}
-          fi    
+        uses: sivakumarvunnam/argocd-helm-update-yaml@main # Uses an action in the root directory
+        id: deployment-update
+        with:
+          git_user: username
+          git_password: ${{ secrets.GH_TOKEN }} 
+          image_tag: ${{inputs.docker_tag}}
+          app_name: ${{inputs.app_name}}
+          environment: ${{ steps.branch_check.outputs.env_name }}
+          git_repo: reponame
+          git_branch: originize_repo    
           
  
