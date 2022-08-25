@@ -142,7 +142,9 @@ on:
       INPUTCONFIGSERVICE_MONGO_AUTHENTICATION:
         required: false 
       MONGODB_ARCHIVE:
-        required: false  
+        required: false
+      ARGOCD_PASSWORD:
+        required: false
         
 jobs:
   build-and-push-docker-image:
