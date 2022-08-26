@@ -184,7 +184,7 @@ jobs:
                 echo "::set-output name=env_name::qa"
           fi
           if [ "${{ steps.values.outputs.branch_name }}" = "GitHub" ]; then
-            echo "::set-output name=env_name::dev"
+            echo "::set-output name=env_name::dot"
           fi
           if [ "${{ steps.values.outputs.branch_name }}" = "nightly" ]; then
             echo "::set-output name=env_name::int"
@@ -400,7 +400,7 @@ jobs:
         with:
           repository: avetta/argocd-helm
           token: ${{ secrets.GH_TOKEN }}
-          ref: nightly
+          ref: image_updater
 
       - name: Update image tag in helm chart
         if: github.event_name != 'pull_request'
@@ -413,7 +413,7 @@ jobs:
           app_name: ${{inputs.app_name}}
           environment: ${{ steps.branch_check.outputs.env_name }}
           git_repo: avetta/argocd-helm
-          git_branch: nightly
+          git_branch: image_updater
           github_token: ${{ secrets.GH_TOKEN }}
           ARGOCD_PASSWORD: ${{ secrets.ARGOCD_PASSWORD }}
           
