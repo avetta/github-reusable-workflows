@@ -417,14 +417,14 @@ jobs:
           github_token: ${{ secrets.GH_TOKEN }}
           ARGOCD_PASSWORD: ${{ secrets.ARGOCD_PASSWORD }}
           
-      - name: argocd sync
-        shell: bash
-        run: |
-          ARGOCLI_VERSION=$(curl --silent "https://api.github.com/repos/argoproj/argo-cd/releases/latest" | grep '"tag_name"' | sed -E 's/.*"([^"]+)".*/\1/')
-          sudo curl --silent --location -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/download/$ARGOCLI_VERSION/argocd-linux-amd64
-          sudo chmod +x /usr/local/bin/argocd
-          argocd login ${{ steps.branch_check.outputs.env_name }}-argocd.avettatech.com --username admin --password ${{ secrets.ARGOCD_PASSWORD }} --insecure --grpc-web
-          argocd app sync ${{inputs.app_name}} --grpc-web
-          argocd app wait ${{inputs.app_name}} --grpc-web --timeout 300   
+      #- name: argocd sync
+       # shell: bash
+        #run: |
+         # ARGOCLI_VERSION=$(curl --silent "https://api.github.com/repos/argoproj/argo-cd/releases/latest" | grep '"tag_name"' | sed -E 's/.*"([^"]+)".*/\1/')
+          #sudo curl --silent --location -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/download/$ARGOCLI_VERSION/argocd-linux-amd64
+          #sudo chmod +x /usr/local/bin/argocd
+          #argocd login ${{ steps.branch_check.outputs.env_name }}-argocd.avettatech.com --username admin --password ${{ secrets.ARGOCD_PASSWORD }} --insecure --grpc-web
+          #argocd app sync ${{inputs.app_name}} --grpc-web
+          #argocd app wait ${{inputs.app_name}} --grpc-web --timeout 300   
           
  
