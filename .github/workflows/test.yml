@@ -115,7 +115,9 @@ on:
       DOCKER_PASSWORD:
         required: true
       jenkins_url:
-        required: true 
+        required: true
+      JENKINS_PROXY:
+        required: true
       jenkins_password:
         required: true 
       JFROG_USERNAME:
@@ -394,18 +396,21 @@ jobs:
             # --user ${{inputs.jenkins_user}}:${{secrets.jenkins_password}} \
              #--data ContainerName=${{inputs.app_name}} --data DockerHubTag=${{inputs.docker_tag}}
           #fi 
-          
-      - name: Trigger jenkins job
-        if: "${{ steps.branch_check.outputs.env_name != null &&  github.event_name != 'pull_request'}}"
-        uses: estherk0/jenkins-trigger@main
+           
+      - name: Trigger your-awesome-job-name job
+        uses: toptal/jenkins-job-trigger-action@master
         with:
-            url: ${{secrets.jenkins_url}}
-            job_name: "${{ steps.branch_check.outputs.env_name }}-deploy-generic"
-            user_name: ${{inputs.jenkins_user}}
-            api_token: ${{secrets.jenkins_password}}
-            parameter: '{"ContainerName":"${{inputs.app_name}}","DockerHubTag":"${{inputs.docker_tag}}"}'
-            wait: "true"
-            timeout: "1000"   
+          jenkins_url: "${{secrets.jenkins_url}}/"
+          jenkins_user: ${{inputs.jenkins_user}}
+          jenkins_token: ${{secrets.jenkins_password}}
+          proxy: ${{secrets.JENKINS_PROXY}}
+          job_name: "${{ steps.branch_check.outputs.env_name }}-deploy-generic"
+          job_params: |
+            {
+              "ContainerName": "${{inputs.app_name}}",
+              "DockerHubTag": "${{inputs.docker_tag}}"
+            }
+          job_timeout: "300" # Default 30 sec. (optional)      
           
      # - name: ArgoCD Repo Checkout
       #  uses: actions/checkout@v3
