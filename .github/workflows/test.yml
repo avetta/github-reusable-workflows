@@ -421,7 +421,7 @@ jobs:
 
       - name: Update image tag in helm chart
         if: github.event_name != 'pull_request'
-        uses: avetta/argocd-helm-update-yaml@image_updater # Uses an action in the root directory
+        uses: avetta/argocd-helm-update-yaml@nightly # Uses an action in the root directory
         id: deployment-update
         with:
           git_user: ${{inputs.git_user}}
