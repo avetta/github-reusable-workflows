@@ -116,8 +116,6 @@ on:
         required: true
       jenkins_url:
         required: true
-      JENKINS_PROXY:
-        required: true
       jenkins_password:
         required: true 
       JFROG_USERNAME:
