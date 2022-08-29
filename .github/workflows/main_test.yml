@@ -13,6 +13,11 @@ on:
         description: node_version
         required: false
         type: string
+        default: 'latest' 
+      apiname:
+        description: node_version
+        required: false
+        type: string
         default: 'latest'  
       git_user:
         description: username to access github repo
@@ -392,7 +397,7 @@ jobs:
       - name: Deploy validation
         if: "${{ steps.branch_check.outputs.env_name != '' &&  github.event_name != 'pull_request'}}"
         run: |
-          build=$(curl https://${{ steps.branch_check.outputs.env_name }}-api.avetta.com/${{inputs.app_name}}/v1/version | jq -r '.buildId')
+          build=$(curl https://${{ steps.branch_check.outputs.env_name }}-api.avetta.com/${{inputs.apiname}}/v1/version | jq -r '.buildId')
           if [ "$build" = "${{inputs.GITHUB_BUILD_NUMBER}}" ]; then
               echo "Deploy validation successful."
           else
