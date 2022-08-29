@@ -385,32 +385,32 @@ jobs:
           npm run test
           npm prune --production     
               
-      #- name: Trigger your-awesome-job-name job
-       # if: github.event_name != 'pull_request'
-        #run: |  
-         # environment=${{ steps.branch_check.outputs.env_name }}
-          #if [ -z $environment ]; then
-           # echo "Deployment configuration not found"
-          #else
-           # curl ${{secrets.jenkins_url}}/job/${{ steps.branch_check.outputs.env_name }}-deploy-generic/buildWithParameters \
-            # --user ${{inputs.jenkins_user}}:${{secrets.jenkins_password}} \
-             #--data ContainerName=${{inputs.app_name}} --data DockerHubTag=${{inputs.docker_tag}}
-          #fi 
-           
       - name: Trigger your-awesome-job-name job
-        uses: toptal/jenkins-job-trigger-action@master
-        with:
-          jenkins_url: "${{secrets.jenkins_url}}/"
-          jenkins_user: ${{inputs.jenkins_user}}
-          jenkins_token: ${{secrets.jenkins_password}}
-          proxy: ${{secrets.JENKINS_PROXY}}
-          job_name: "${{ steps.branch_check.outputs.env_name }}-deploy-generic"
-          job_params: |
-            {
-              "ContainerName": "${{inputs.app_name}}",
-              "DockerHubTag": "${{inputs.docker_tag}}"
-            }
-          job_timeout: "300" # Default 30 sec. (optional)      
+        if: github.event_name != 'pull_request'
+        run: |  
+          environment=${{ steps.branch_check.outputs.env_name }}
+          if [ -z $environment ]; then
+            echo "Deployment configuration not found"
+          else
+            curl ${{secrets.jenkins_url}}/job/${{ steps.branch_check.outputs.env_name }}-deploy-generic/buildWithParameters \
+             --user ${{inputs.jenkins_user}}:${{secrets.jenkins_password}} \
+             --data ContainerName=${{inputs.app_name}} --data DockerHubTag=${{inputs.docker_tag}}
+          fi 
+           
+      #- name: Trigger your-awesome-job-name job
+       # uses: toptal/jenkins-job-trigger-action@master
+        #with:
+         # jenkins_url: "${{secrets.jenkins_url}}/"
+          #jenkins_user: ${{inputs.jenkins_user}}
+          #jenkins_token: ${{secrets.jenkins_password}}
+          #proxy: ${{secrets.JENKINS_PROXY}}
+          #job_name: "${{ steps.branch_check.outputs.env_name }}-deploy-generic"
+          #job_params: |
+           # {
+            #  "ContainerName": "${{inputs.app_name}}",
+             # "DockerHubTag": "${{inputs.docker_tag}}"
+            #}
+          #job_timeout: "300" # Default 30 sec. (optional)      
           
      # - name: ArgoCD Repo Checkout
       #  uses: actions/checkout@v3
