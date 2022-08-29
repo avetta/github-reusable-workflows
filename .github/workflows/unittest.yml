@@ -101,8 +101,11 @@ on:
       mondb_wd_scoring:
         description: coverage_report
         required: false
+        type: string
+      ARGOCD_PASSWORD: 
+        description: ARGOCD_PASSWORD
+        required: false
         type: string  
-        
         
     secrets:
       git_password:
@@ -112,13 +115,17 @@ on:
       DOCKER_PASSWORD:
         required: true
       jenkins_url:
-        required: true 
+        required: true
+      JENKINS_PROXY:
+        required: true
       jenkins_password:
         required: true 
       JFROG_USERNAME:
         required: false
       JFROG_PASSWORD:
         required: false
+      GH_TOKEN:
+        required: false  
       MONGODB_WD:
         required: false
       MONGODB_HOST:
@@ -136,7 +143,9 @@ on:
       INPUTCONFIGSERVICE_MONGO_AUTHENTICATION:
         required: false 
       MONGODB_ARCHIVE:
-        required: false  
+        required: false
+      ARGOCD_PASSWORD:
+        required: false
         
 jobs:
   build-and-push-docker-image:
@@ -177,7 +186,7 @@ jobs:
                 echo "::set-output name=env_name::qa"
           fi
           if [ "${{ steps.values.outputs.branch_name }}" = "GitHub" ]; then
-            echo "::set-output name=env_name::dev"
+            echo "::set-output name=env_name::dot"
           fi
           if [ "${{ steps.values.outputs.branch_name }}" = "nightly" ]; then
             echo "::set-output name=env_name::int"
@@ -376,27 +385,15 @@ jobs:
           npm run test
           npm prune --production     
               
-     # - name: Trigger your-awesome-job-name job
-      #  if: github.event_name != 'pull_request'
-       # run: |  
-        #  environment=${{ steps.branch_check.outputs.env_name }}
-         # if [ -z $environment ]; then
-          #  echo "Deployment configuration not found"
-          #else
-           # curl ${{secrets.jenkins_url}}/job/${{ steps.branch_check.outputs.env_name }}-deploy-generic/buildWithParameters \
-            # --user ${{inputs.jenkins_user}}:${{secrets.jenkins_password}} \
-             #--data ContainerName=${{inputs.app_name}} --data DockerHubTag=${{inputs.docker_tag}}
-          #fi 
-          
-       - name: Trigger jenkins job
-         if: github.event_name != 'pull_request'
-         uses: joshlk/jenkins-githubaction@master
-         with:
+      - name: Trigger jenkins job
+        if: github.event_name != 'pull_request'
+        uses: joshlk/jenkins-githubaction@master
+        with:
            url: ${{secrets.jenkins_url}}
            job_name: ${{ steps.branch_check.outputs.env_name }}-deploy-generic
            username: ${{inputs.jenkins_user}}
            api_token: ${{secrets.jenkins_password}}
-           parameters: {"ContainerName":"${{inputs.app_name}}", "DockerHubTag":"${{inputs.docker_tag}}"}
+           parameters: '{"ContainerName":"${{inputs.app_name}}", "DockerHubTag":"${{inputs.docker_tag}}"}'
            wait: True
            interval: 5
            timeout: "1000"   
