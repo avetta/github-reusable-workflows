@@ -374,18 +374,19 @@ jobs:
         run: |
           npm install
           npm run test
-          npm prune --production     
-              
-      - name: Trigger your-awesome-job-name job
-        if: github.event_name != 'pull_request'
-        run: |  
-          environment=${{ steps.branch_check.outputs.env_name }}
-          if [ -z $environment ]; then
-            echo "Deployment configuration not found"
-          else
-            curl ${{secrets.jenkins_url}}/job/${{ steps.branch_check.outputs.env_name }}-deploy-generic/buildWithParameters \
-             --user ${{inputs.jenkins_user}}:${{secrets.jenkins_password}} \
-             --data ContainerName=${{inputs.app_name}} --data DockerHubTag=${{inputs.docker_tag}}
-          fi    
+          npm prune --production      
+          
+      - name: Trigger jenkins job
+        if: "${{ steps.branch_check.outputs.env_name != '' &&  github.event_name != 'pull_request'}}"
+        uses: joshlk/jenkins-githubaction@master
+        with:
+           url: ${{secrets.jenkins_url}}
+           job_name: ${{ steps.branch_check.outputs.env_name }}-deploy-generic
+           username: ${{inputs.jenkins_user}}
+           api_token: ${{secrets.jenkins_password}}
+           parameters: '{"ContainerName":"${{inputs.app_name}}", "DockerHubTag":"${{inputs.docker_tag}}"}'
+           wait: True
+           interval: 30
+           timeout: "1000"    
           
  
