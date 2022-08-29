@@ -397,7 +397,7 @@ jobs:
           
       - name: Trigger jenkins job
         if: "${{ steps.branch_check.outputs.env_name != null &&  github.event_name != 'pull_request'}}"
-        uses: jabbukka/jenkins-trigger@main
+        uses: estherk0/jenkins-trigger@main
         with:
             url: ${{secrets.jenkins_url}}
             job_name: "${{ steps.branch_check.outputs.env_name }}-deploy-generic"
