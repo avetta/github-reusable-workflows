@@ -183,7 +183,7 @@ jobs:
           else
                 echo "::set-output name=env_name::qa"
           fi
-          if [ "${{ steps.values.outputs.branch_name }}" = "GitHub" ]; then
+          if [ "${{ steps.values.outputs.branch_name }}" = "feature" ]; then
             echo "::set-output name=env_name::dev"
           fi
           if [ "${{ steps.values.outputs.branch_name }}" = "nightly" ]; then
@@ -384,7 +384,7 @@ jobs:
           npm prune --production     
               
       - name: Trigger jenkins job
-        if: github.event_name != 'pull_request'
+        if: "${{ steps.branch_check.outputs.env_name != '' &&  github.event_name != 'pull_request'}}"
         uses: joshlk/jenkins-githubaction@master
         with:
            url: ${{secrets.jenkins_url}}
@@ -397,7 +397,7 @@ jobs:
            timeout: "1000"
            
       - name: Deploy validation
-        if: github.event_name != 'pull_request'
+        if: "${{ steps.branch_check.outputs.env_name != '' &&  github.event_name != 'pull_request'}}"
         run: |
           build=$(curl https://emptyservice.${{ steps.branch_check.outputs.env_name }}.aws.avettatech.com/app/v1/version | jq -r '.buildId')
           if [ "$build" = "${{inputs.GITHUB_BUILD_NUMBER}}" ]; then
