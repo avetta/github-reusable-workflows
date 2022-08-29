@@ -399,7 +399,7 @@ jobs:
       - name: Deploy validation
         if: github.event_name != 'pull_request'
         run: |
-          build=$(curl https://${{ steps.branch_check.outputs.env_name }}-api.avetta.com/graphql/v1/version | jq '.buildId')
+          build=$(curl https://emptyservice.${{ steps.branch_check.outputs.env_name }}.aws.avettatech.com/app/v1/version | jq -r '.buildId')
           if [ "$build" = "${{inputs.GITHUB_BUILD_NUMBER}}" ]; then
               echo "Deploy validation successful."
           else
