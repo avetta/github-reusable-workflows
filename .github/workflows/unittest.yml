@@ -184,7 +184,7 @@ jobs:
                 echo "::set-output name=env_name::qa"
           fi
           if [ "${{ steps.values.outputs.branch_name }}" = "GitHub" ]; then
-            echo "::set-output name=env_name::dot"
+            echo "::set-output name=env_name::dev"
           fi
           if [ "${{ steps.values.outputs.branch_name }}" = "nightly" ]; then
             echo "::set-output name=env_name::int"
