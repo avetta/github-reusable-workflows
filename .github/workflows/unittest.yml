@@ -393,7 +393,17 @@ jobs:
            api_token: ${{secrets.jenkins_password}}
            parameters: '{"ContainerName":"${{inputs.app_name}}", "DockerHubTag":"${{inputs.docker_tag}}"}'
            wait: True
-           interval: 5
-           timeout: "1000"   
+           interval: 10
+           timeout: "1000"
+           
+      - name: Deploy validation
+        if: github.event_name != 'pull_request'
+        run: |
+          build=$(curl https://${{ steps.branch_check.outputs.env_name }}-api.avetta.com/graphql/v1/version | jq '.buildId')
+          if [ "$build" = "${{inputs.GITHUB_BUILD_NUMBER}}" ]; then
+              echo "Deploy validation successful."
+          else
+              echo "Deploy validation failed."
+          fi     
           
  
