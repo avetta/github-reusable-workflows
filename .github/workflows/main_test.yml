@@ -21,7 +21,7 @@ on:
         default: 'latest'  
       git_user:
         description: username to access github repo
-        required: true
+        required: false
         type: string
       app_name:
         description: App name to be update
