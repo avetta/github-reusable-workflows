@@ -394,7 +394,7 @@ jobs:
            interval: 30
            timeout: "1000"
           
-      - name: Deploy validation
+      - name: Validating Deploy
         if: "${{ steps.branch_check.outputs.env_name != '' &&  github.event_name != 'pull_request'}}"
         run: |
           build=$(curl https://${{ steps.branch_check.outputs.env_name }}-api.avetta.com/${{inputs.apiname}}/v1/version | jq -r '.buildId')
