@@ -41,7 +41,7 @@ on:
         type: string  
       jenkins_user:
         description: Jenkins user
-        required: true
+        required: false
         type: string
       GITHUB_COMMIT:
         description: commit id
