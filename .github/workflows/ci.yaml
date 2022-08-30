@@ -1,6 +1,6 @@
 name: Avetta UI application Build and Deploy to using Github Actions and ArgoCD
 on:
-  # run it on push to the default repository  branch
+  # run it on push to the default repository branch
   create:
     branches-ignore:
       - '*'
