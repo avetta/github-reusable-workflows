@@ -101,11 +101,12 @@ on:
       mondb_wd_scoring:
         description: coverage_report
         required: false
-        type: string
-      ARGOCD_PASSWORD: 
-        description: ARGOCD_PASSWORD
+        type: string 
+      scalafmtCheckAll:
+        description: coverage_report
         required: false
-        type: string  
+        type: string
+        
         
     secrets:
       git_password:
@@ -115,15 +116,13 @@ on:
       DOCKER_PASSWORD:
         required: true
       jenkins_url:
-        required: true
+        required: true 
       jenkins_password:
         required: true 
       JFROG_USERNAME:
         required: false
       JFROG_PASSWORD:
         required: false
-      GH_TOKEN:
-        required: false  
       MONGODB_WD:
         required: false
       MONGODB_HOST:
@@ -141,9 +140,7 @@ on:
       INPUTCONFIGSERVICE_MONGO_AUTHENTICATION:
         required: false 
       MONGODB_ARCHIVE:
-        required: false
-      ARGOCD_PASSWORD:
-        required: false
+        required: false  
         
 jobs:
   build-and-push-docker-image:
@@ -183,7 +180,7 @@ jobs:
           else
                 echo "::set-output name=env_name::qa"
           fi
-          if [ "${{ steps.values.outputs.branch_name }}" = "GitHub" ]; then
+          if [ "${{ steps.values.outputs.branch_name }}" = "feature" ]; then
             echo "::set-output name=env_name::dev"
           fi
           if [ "${{ steps.values.outputs.branch_name }}" = "nightly" ]; then
@@ -201,7 +198,10 @@ jobs:
         if: "${{ steps.values.outputs.java == 'true'}}"
         uses: olafurpg/setup-scala@v10
         with:
-          java-version: ${{ matrix.java }}    
+          java-version: ${{ matrix.java }}
+          
+      - name: Setup Scala
+        uses: japgolly/setup-everything-scala@v3.1    
 
       - name: Use Node.js ${{inputs.node-version}}
         if: "${{ steps.values.outputs.ui == 'true'}}"
@@ -278,6 +278,7 @@ jobs:
           export JFROG_PASSWORD=${{secrets.JFROG_PASSWORD}}
           export JFROG_RO_USER=${{secrets.JFROG_USERNAME}}
           export JFROG_RO_PASSWORD=${{secrets.JFROG_PASSWORD}}
+          ${{inputs.scalafmtCheckAll}}
           ${{inputs.clean_coverage}}
           ${{inputs.coverage_report}}
           
@@ -381,8 +382,8 @@ jobs:
         run: |
           npm install
           npm run test
-          npm prune --production     
-              
+          npm prune --production      
+          
       - name: Trigger jenkins job
         if: "${{ steps.branch_check.outputs.env_name != '' &&  github.event_name != 'pull_request'}}"
         uses: joshlk/jenkins-githubaction@master
@@ -392,29 +393,8 @@ jobs:
            username: ${{inputs.jenkins_user}}
            api_token: ${{secrets.jenkins_password}}
            parameters: '{"ContainerName":"${{inputs.app_name}}", "DockerHubTag":"${{inputs.docker_tag}}"}'
-           wait: True
-           interval: 10
-           timeout: "1000"
-           
-      #- name: Deploy validation
-       # if: "${{ steps.branch_check.outputs.env_name != '' &&  github.event_name != 'pull_request'}}"
-        #run: |
-         # build=$(curl https://emptyservice.${{ steps.branch_check.outputs.env_name }}.aws.avettatech.com/app/v1/version | jq -r '.buildId')
-          #if [ "$build" = "${{inputs.GITHUB_BUILD_NUMBER}}" ]; then
-           #   echo "Deploy validation successful."
-          #else
-           #   echo "Deploy validation failed."
-          #fi 
-          
-      - name: Deploy validation
-        if: "${{ steps.branch_check.outputs.env_name != '' &&  github.event_name != 'pull_request'}}"
-        run: |
-          #build=$(curl https://emptyservice.${{ steps.branch_check.outputs.env_name }}.aws.avettatech.com/app/v1/version | jq -r '.buildId')
-          #if [ "$build" = "${{inputs.GITHUB_BUILD_NUMBER}}" ]; then
-              echo "Deploy validation successful."
-          #else
-          echo "Deploy validation failed."
-              exit 1
-          #fi     
+           wait: False
+           interval: 30
+           timeout: "1000"    
           
  
