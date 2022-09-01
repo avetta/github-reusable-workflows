@@ -101,7 +101,11 @@ on:
       mondb_wd_scoring:
         description: coverage_report
         required: false
-        type: string  
+        type: string 
+      scalafmtCheckAll:
+        description: coverage_report
+        required: false
+        type: string
         
         
     secrets:
@@ -271,6 +275,7 @@ jobs:
           export JFROG_PASSWORD=${{secrets.JFROG_PASSWORD}}
           export JFROG_RO_USER=${{secrets.JFROG_USERNAME}}
           export JFROG_RO_PASSWORD=${{secrets.JFROG_PASSWORD}}
+          ${{inputs.scalafmtCheckAll}}
           ${{inputs.clean_coverage}}
           ${{inputs.coverage_report}}
           
