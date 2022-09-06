@@ -186,7 +186,7 @@ jobs:
                 echo "::set-output name=env_name::qa"
           fi
           if [ "${{ steps.values.outputs.branch_name }}" = "GitHub" ]; then
-            echo "::set-output name=env_name::dev"
+            echo "::set-output name=env_name::dot"
           fi
           if [ "${{ steps.values.outputs.branch_name }}" = "nightly" ]; then
             echo "::set-output name=env_name::int"
@@ -399,49 +399,38 @@ jobs:
              #--data ContainerName=${{inputs.app_name}} --data DockerHubTag=${{inputs.docker_tag}}
           #fi 
            
-      - name: Trigger jenkins job
-        if: "${{ steps.branch_check.outputs.env_name != '' &&  github.event_name != 'pull_request'}}"
-        uses: joshlk/jenkins-githubaction@master
+     
+          
+      - name: ArgoCD Repo Checkout
+        uses: actions/checkout@v3
         with:
-           url: ${{secrets.jenkins_url}}
-           job_name: ${{ steps.branch_check.outputs.env_name }}-deploy-generic
-           username: ${{inputs.jenkins_user}}
-           api_token: ${{secrets.jenkins_password}}
-           parameters: '{"ContainerName":"${{inputs.app_name}}", "DockerHubTag":"${{inputs.docker_tag}}"}'
-           wait: false
-           interval: 30
-           timeout: "1000"      
-          
-     # - name: ArgoCD Repo Checkout
-      #  uses: actions/checkout@v3
-       # with:
-        #  repository: avetta/argocd-helm
-         # token: ${{ secrets.GH_TOKEN }}
-          #ref: image_updater
+          repository: avetta/argocd-helm
+          token: ${{ secrets.GH_TOKEN }}
+          ref: image_updater
 
-      #- name: Update image tag in helm chart
-       # if: github.event_name != 'pull_request'
-        #uses: avetta/argocd-helm-update-yaml@nightly # Uses an action in the root directory
-        #id: deployment-update
-        #with:
-         # git_user: ${{inputs.git_user}}
-          #git_password: ${{ secrets.GH_TOKEN }} 
-          #image_tag: ${{inputs.docker_tag}}
-          #app_name: ${{inputs.app_name}}
-          #environment: ${{ steps.branch_check.outputs.env_name }}
-          #git_repo: avetta/argocd-helm
-          #git_branch: image_updater
-          #github_token: ${{ secrets.GH_TOKEN }}
-          #ARGOCD_PASSWORD: ${{ secrets.ARGOCD_PASSWORD }}
+      - name: Update image tag in helm chart
+        if: github.event_name != 'pull_request'
+        uses: avetta/argocd-helm-update-yaml@nightly # Uses an action in the root directory
+        id: deployment-update
+        with:
+          git_user: ${{inputs.git_user}}
+          git_password: ${{ secrets.GH_TOKEN }} 
+          image_tag: ${{inputs.docker_tag}}
+          app_name: ${{inputs.app_name}}
+          environment: ${{ steps.branch_check.outputs.env_name }}
+          git_repo: avetta/argocd-helm
+          git_branch: image_updater
+          github_token: ${{ secrets.GH_TOKEN }}
+          ARGOCD_PASSWORD: ${{ secrets.ARGOCD_PASSWORD }}
           
-     # - name: argocd sync
-      #  shell: bash
-       # run: |
-        #  ARGOCLI_VERSION=$(curl --silent "https://api.github.com/repos/argoproj/argo-cd/releases/latest" | grep '"tag_name"' | sed -E 's/.*"([^"]+)".*/\1/')
-         # sudo curl --silent --location -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/download/$ARGOCLI_VERSION/argocd-linux-amd64
-          #sudo chmod +x /usr/local/bin/argocd
-          #argocd login ${{ steps.branch_check.outputs.env_name }}-argocd.avettatech.com --username admin --password ${{ secrets.ARGOCD_PASSWORD }} --insecure --grpc-web
-          #argocd app sync ${{inputs.app_name}} --grpc-web
-          #argocd app wait ${{inputs.app_name}} --grpc-web --timeout 300   
+      - name: argocd sync
+        shell: bash
+        run: |
+          ARGOCLI_VERSION=$(curl --silent "https://api.github.com/repos/argoproj/argo-cd/releases/latest" | grep '"tag_name"' | sed -E 's/.*"([^"]+)".*/\1/')
+          sudo curl --silent --location -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/download/$ARGOCLI_VERSION/argocd-linux-amd64
+          sudo chmod +x /usr/local/bin/argocd
+          argocd login ${{ steps.branch_check.outputs.env_name }}-argocd.avettatech.com --username admin --password ${{ secrets.ARGOCD_PASSWORD }} --insecure --grpc-web
+          argocd app sync ${{inputs.app_name}} --grpc-web
+          argocd app wait ${{inputs.app_name}} --grpc-web --timeout 300   
           
  
