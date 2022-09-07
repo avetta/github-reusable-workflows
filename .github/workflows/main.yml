@@ -390,7 +390,7 @@ jobs:
            username: ${{inputs.jenkins_user}}
            api_token: ${{secrets.jenkins_password}}
            parameters: '{"ContainerName":"${{inputs.app_name}}", "DockerHubTag":"${{inputs.docker_tag}}"}'
-           wait: false
+           wait: False
            interval: 30
            timeout: "1000"    
           
