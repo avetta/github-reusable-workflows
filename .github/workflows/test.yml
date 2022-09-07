@@ -366,6 +366,7 @@ jobs:
           #echo "ADD ./newrelic/newrelic.yml /opt/docker/lib/" | sudo tee -a $Dockerfile
           echo "ADD ./conf/newrelic.yml /opt/docker/lib/" | sudo tee -a $Dockerfile
           echo "RUN chmod u+w /opt/docker/lib/" | sudo tee -a $Dockerfile
+          echo "RUN chmod u+w /opt/docker/" | sudo tee -a $Dockerfile
           
           ls -ltr
           cat ./conf/serviceVersion.properties
