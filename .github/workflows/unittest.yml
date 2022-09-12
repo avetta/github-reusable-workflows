@@ -278,7 +278,7 @@ jobs:
           export JFROG_PASSWORD=${{secrets.JFROG_PASSWORD}}
           export JFROG_RO_USER=${{secrets.JFROG_USERNAME}}
           export JFROG_RO_PASSWORD=${{secrets.JFROG_PASSWORD}}
-          ${{inputs.scalafmtCheckAll}}
+          #${{inputs.scalafmtCheckAll}}
           ${{inputs.clean_coverage}}
           ${{inputs.coverage_report}}
           
