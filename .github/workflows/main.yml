@@ -58,6 +58,10 @@ on:
         description: ui
         required: false
         type: string
+      envconfigservice:
+        description: ui
+        required: false
+        type: string  
       npm_test:
         description: npm_test
         required: false
@@ -207,6 +211,13 @@ jobs:
           node-version: ${{inputs.node-version}}
           cache: 'npm'
           
+      - name: Use Node.js ${{inputs.node-version}}
+        if: "${{ steps.values.outputs.envconfigservice == 'true'}}"
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{inputs.node-version}}
+          cache: 'npm'    
+          
       - name: Cache Node Modules
         if: "${{ steps.values.outputs.ui == 'true'}}"
         id: cache-node-modules
@@ -214,6 +225,14 @@ jobs:
         with:
           path: node_modules
           key: node-modules-${{ hashFiles('package-lock.json') }}
+          
+      - name: Cache Node Modules
+        if: "${{ steps.values.outputs.envconfigservice == 'true'}}"
+        id: cache-node
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: node-modules-${{ hashFiles('package-lock.json') }}    
           
       - name: Cache sbt
         if: "${{ steps.values.outputs.cache_sbt == 'true'}}"
@@ -256,9 +275,18 @@ jobs:
           ${PWD}/${{secrets.MONGODB_WD}}/bin/mongo scoring --eval 'db.createUser({user:"${{secrets.INPUTCONFIGSERVICE_MONGO_USER}}",pwd:"${{secrets.INPUTCONFIGSERVICE_MONGO_PWD}}",roles:[{role:"readWrite",db:"scoring"}]});'
           ${PWD}/${{secrets.MONGODB_WD}}/bin/mongo input_config --eval 'db.createUser({user:"${{secrets.INPUTCONFIGSERVICE_MONGO_USER}}",pwd:"${{secrets.INPUTCONFIGSERVICE_MONGO_PWD}}",roles:[{role:"readWrite",db:"input_config"}]})'
        
+     
       - name: npm install
         if: "${{ steps.cache.outputs.cache-hit != 'true' &&  steps.values.outputs.ui == 'true'}}"
         run: npm install
+        
+      - name: post npm install
+        if: "${{ steps.cache.outputs.cache-hit != 'true' &&  steps.values.outputs.envconfigservice == 'true'}}"
+        run: |
+          cd ui 
+          npm install
+          npm run build
+          cd ..
 
       - name: Run list and prettier and elm-format and run build
         if: "${{ steps.values.outputs.ui == 'true'}}"
