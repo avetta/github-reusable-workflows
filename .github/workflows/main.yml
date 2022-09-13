@@ -217,7 +217,8 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{inputs.node-version}}
-          cache: 'npm'    
+          cache: 'npm' 
+          cache-dependency-path: ui/yarn.lock
           
       - name: Cache Node Modules
         if: "${{ steps.values.outputs.ui == 'true'}}"
