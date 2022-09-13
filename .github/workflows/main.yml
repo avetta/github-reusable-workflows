@@ -163,6 +163,7 @@ jobs:
         id: values
         run: |
           echo '::set-output name=ui::'${{inputs.ui}} 
+          echo '::set-output name=envconfigservice::'${{inputs.envconfigservice}}
           echo '::set-output name=java::'${{inputs.java}}
           echo '::set-output name=jobservice::'${{inputs.jobservice}}
           echo '::set-output name=branch_name::'${{inputs.branch_name}}
