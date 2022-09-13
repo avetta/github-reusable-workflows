@@ -282,7 +282,7 @@ jobs:
         if: "${{ steps.cache.outputs.cache-hit != 'true' &&  steps.values.outputs.ui == 'true'}}"
         run: npm install
         
-      - name: post npm install
+      - name: npm install in custom dir
         if: "${{ steps.cache.outputs.cache-hit != 'true' &&  steps.values.outputs.envconfigservice == 'true'}}"
         run: |
           cd ui 
@@ -409,7 +409,13 @@ jobs:
         run: |
           npm install
           npm run test
-          npm prune --production      
+          npm prune --production 
+          
+      - name: Run npm test
+        if: "${{ steps.values.outputs.envconfigservice == 'true'}}"
+        run: |
+          npm install
+          npm prune --production    
           
       #- name: Trigger jenkins job
        # if: "${{ steps.branch_check.outputs.env_name != '' &&  github.event_name != 'pull_request'}}"
