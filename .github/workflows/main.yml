@@ -369,7 +369,7 @@ jobs:
           tags: pics/${{inputs.app_name}}:${{inputs.docker_tag}}
           
       - name: Build image
-        if: "${{ steps.setversion.outputs.embed_apm == 'true' &&  github.event_name != 'pull_request'}}"
+        if: "${{ steps.setversion.outputs.embed_apm != 'false' &&  github.event_name != 'pull_request'}}"
         id: docker_build2
         uses: docker/build-push-action@v2
         with:
@@ -378,19 +378,7 @@ jobs:
           push: false
            # Note: tags has to be all lower-case
           tags: pics/${{inputs.app_name}}:${{inputs.docker_tag}} 
-          
-      - name: Build image
-        if: "${{ steps.setversion.outputs.embed_apm == 'upgrade' &&  github.event_name != 'pull_request'}}"
-        id: docker_build3
-        uses: docker/build-push-action@v2
-        with:
-           # relative path to the place where source code with Dockerfile is located
-          context: ${{inputs.docker_context}}
-          push: false
-           # Note: tags has to be all lower-case
-          tags: pics/${{inputs.app_name}}:${{inputs.docker_tag}}     
-          
-      
+              
       - name: EmbedAPM        
         if: "${{ steps.setversion.outputs.embed_apm == 'true' &&  github.event_name != 'pull_request'}}"
         run: |
