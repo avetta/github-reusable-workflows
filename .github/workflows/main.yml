@@ -432,7 +432,7 @@ jobs:
           cat ./conf/serviceVersion.properties     
       
       - name: Build image and push to DockerHub
-        if: "${{ steps.setversion.outputs.embed_apm == 'true' &&  github.event_name != 'pull_request'}}"
+        if: "${{ steps.setversion.outputs.embed_apm != 'false' &&  github.event_name != 'pull_request'}}"
         id: docker_build_push
         uses: docker/build-push-action@v2
         with:
@@ -441,29 +441,7 @@ jobs:
           push: true
            # Note: tags has to be all lower-case
           tags: pics/${{inputs.app_name}}:${{inputs.docker_tag}}
-          
-      - name: Build image and push to DockerHub
-        if: "${{ steps.setversion.outputs.embed_apm == 'upgrade' &&  github.event_name != 'pull_request'}}"
-        id: docker_build_push2
-        uses: docker/build-push-action@v2
-        with:
-           # relative path to the place where source code with Dockerfile is located
-          context: .
-          push: true
-           # Note: tags has to be all lower-case
-          tags: pics/${{inputs.app_name}}:${{inputs.docker_tag}} 
-          
-      - name: Build image and push to DockerHub
-        if: "${{ steps.setversion.outputs.embed_apm == 'custom' &&  github.event_name != 'pull_request'}}"
-        id: docker_build_push3
-        uses: docker/build-push-action@v2
-        with:
-           # relative path to the place where source code with Dockerfile is located
-          context: .
-          push: true
-           # Note: tags has to be all lower-case
-          tags: pics/${{inputs.app_name}}:${{inputs.docker_tag}}     
-          
+              
       - name: Run npm test
         if: "${{ steps.values.outputs.npm_test == 'true'}}"
         run: |
