@@ -197,6 +197,9 @@ jobs:
           if [ "${{ steps.values.outputs.branch_name }}" = "patch" ]; then
             echo "::set-output name=env_name::qa"
           fi 
+          if [ "${{ steps.values.outputs.branch_name }}" = "main" ]; then
+            echo "::set-output name=env_name::demo"
+          fi
             
           
       - name: Setup Java and Scala
