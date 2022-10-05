@@ -417,7 +417,21 @@ jobs:
           echo "ADD ./conf/newrelic.yml /opt/docker/lib/" | sudo tee -a $Dockerfile
           echo "RUN chmod u+w /opt/docker/lib/" | sudo tee -a $Dockerfile
           ls -ltr
-          cat ./conf/serviceVersion.properties    
+          cat ./conf/serviceVersion.properties
+          
+      - name: custom EmbedAPM        
+        if: "${{ steps.setversion.outputs.embed_apm == 'custom' &&  github.event_name != 'pull_request'}}"
+        run: |
+          curl https://download.newrelic.com/newrelic/java-agent/newrelic-agent/7.9.0/newrelic-java-7.9.0.zip --output newrelic-java-7.9.0.zip
+          unzip newrelic-java-7.9.0.zip
+          export Dockerfile="./Dockerfile"
+          echo "FROM pics/${{inputs.app_name}}:${{inputs.docker_tag}}" | sudo tee -a $Dockerfile
+          echo "ENV JAVA_OPTS="-javaagent:/opt/docker/lib/newrelic.jar"" | sudo tee -a $Dockerfile
+          echo "ADD ./newrelic.jar /opt/docker/lib/" | sudo tee -a $Dockerfile
+          echo "ADD ./conf/newrelic.yml /opt/docker/lib/" | sudo tee -a $Dockerfile
+          echo "RUN chmod u+w /opt/docker/lib/" | sudo tee -a $Dockerfile
+          ls -ltr
+          cat ./conf/serviceVersion.properties     
       
       - name: Build image and push to DockerHub
         if: "${{ steps.setversion.outputs.embed_apm == 'true' &&  github.event_name != 'pull_request'}}"
