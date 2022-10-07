@@ -110,6 +110,10 @@ on:
         description: coverage_report
         required: false
         type: string
+      deploytodemo:
+        description: deploytodemo
+        required: false
+        type: string  
         
         
     secrets:
@@ -175,6 +179,7 @@ jobs:
           echo '::set-output name=cache_sbt::'${{inputs.cache_sbt}}
           echo '::set-output name=mondb_wd::'${{inputs.mondb_wd}}
           echo '::set-output name=mondb_wd_scoring::'${{inputs.mondb_wd_scoring}}
+          echo '::set-output name=deploytodemo::'${{inputs.deploytodemo}}
           
       - name: Some check on branch
         id: branch_check
@@ -197,9 +202,14 @@ jobs:
           if [ "${{ steps.values.outputs.branch_name }}" = "patch" ]; then
             echo "::set-output name=env_name::qa"
           fi 
+          
+      - name: Some check on branch
+        if: "${{ steps.values.outputs.deploytodemo == 'true'}}"
+        id: branch_check_demo
+        run: |
           if [ "${{ steps.values.outputs.branch_name }}" = "main" ]; then
             echo "::set-output name=env_name::demo"
-          fi
+          fi    
             
           
       - name: Setup Java and Scala
