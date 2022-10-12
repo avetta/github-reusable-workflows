@@ -473,6 +473,7 @@ jobs:
            #timeout: "1000"   
            
       - name: Trigger your-awesome-job-name job
+        continue-on-error: true
         if: "${{ steps.branch_check.outputs.env_name != '' &&  github.event_name != 'pull_request'}}"
         run: |  
           environment=${{ steps.branch_check.outputs.env_name }}
