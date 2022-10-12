@@ -479,13 +479,10 @@ jobs:
           if [ -z $environment ]; then
             echo "Deployment configuration not found"
           else
-            curl ${{secrets.jenkins_url}}/job/${{ steps.branch_check.outputs.env_name }}-deploy-generic/buildWithParameters \
+            curl --fail ${{secrets.jenkins_url}}/job/${{ steps.branch_check.outputs.env_name }}-deploy-generic/buildWithParameters \
              --user ${{inputs.jenkins_user}}:${{secrets.jenkins_password}} \
              --data ContainerName=${{inputs.app_name}} --data DockerHubTag=${{inputs.docker_tag}}
-            res=$?
-            if test "$res" != "0"; then
-            echo "the curl command failed with: $res"
-          fi 
+ 
              
           fi      
           
