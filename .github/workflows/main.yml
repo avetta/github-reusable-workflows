@@ -131,6 +131,8 @@ on:
         required: false
       JFROG_PASSWORD:
         required: false
+      MSTEAMS_WEBHOOK:
+        required: false
       MONGODB_WD:
         required: false
       MONGODB_HOST:
@@ -485,6 +487,16 @@ jobs:
              --data ContainerName=${{inputs.app_name}} --data DockerHubTag=${{inputs.docker_tag}}
  
              
-          fi      
+          fi
           
+      - name: Microsoft Teams Notification
+        uses: skitionek/notify-microsoft-teams@master
+        if: always()
+        with:
+          webhook_url: ${{secrets.MSTEAMS_WEBHOOK}}   
+          
+
+               
+          
+       
  
