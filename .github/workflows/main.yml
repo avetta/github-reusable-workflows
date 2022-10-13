@@ -182,6 +182,7 @@ jobs:
           echo '::set-output name=mondb_wd::'${{inputs.mondb_wd}}
           echo '::set-output name=mondb_wd_scoring::'${{inputs.mondb_wd_scoring}}
           echo '::set-output name=deploytodemo::'${{inputs.deploytodemo}}
+          echo '::set-output name=buildnumber::'${{inputs.GITHUB_BUILD_NUMBER}}
           
       - name: Some check on branch
         id: branch_check
@@ -494,7 +495,7 @@ jobs:
         if: always()
         with:
           webhook_url: ${{secrets.MSTEAMS_WEBHOOK}}
-          overwrite: "{title: `${{inputs.GITHUB_BUILD_NUMBER}}`}"
+          overwrite: "{title: `${{ steps.values.outputs.buildnumber }}`}"
           job: ${{ toJson(job) }}
           
 
