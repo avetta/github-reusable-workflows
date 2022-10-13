@@ -494,7 +494,7 @@ jobs:
         if: always()
         with:
           webhook_url: ${{secrets.MSTEAMS_WEBHOOK}}
-          overwrite: "{title: `${{inputs.app_name}}`}"
+          overwrite: "{title: `${{inputs.app_name}}, ${{inputs.branch_name}}`}"
           job: ${{ toJson(job) }}
           
 
