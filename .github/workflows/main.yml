@@ -493,7 +493,8 @@ jobs:
         uses: skitionek/notify-microsoft-teams@master
         if: always()
         with:
-          webhook_url: ${{secrets.MSTEAMS_WEBHOOK}} 
+          webhook_url: ${{secrets.MSTEAMS_WEBHOOK}}
+          overwrite: "{title: `Overwrote title in ${workflow_link}`}"
           needs: ${{ toJson(needs) }}
           job: ${{ toJson(job) }}
           steps: ${{ toJson(steps) }}
