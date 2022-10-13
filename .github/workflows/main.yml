@@ -183,6 +183,7 @@ jobs:
           echo '::set-output name=mondb_wd_scoring::'${{inputs.mondb_wd_scoring}}
           echo '::set-output name=deploytodemo::'${{inputs.deploytodemo}}
           echo '::set-output name=buildnumber::'${{inputs.GITHUB_BUILD_NUMBER}}
+          echo '::set-output name=teamswebhook::'${{secrets.MSTEAMS_WEBHOOK}}
           
       - name: Some check on branch
         id: branch_check
@@ -491,8 +492,8 @@ jobs:
           fi
           
       - name: Microsoft Teams Notification
+        if: "${{ steps.values.outputs.teamswebhook != '' && always()}}"
         uses: skitionek/notify-microsoft-teams@master
-        if: always()
         with:
           webhook_url: ${{secrets.MSTEAMS_WEBHOOK}}
           overwrite: "{title: `${{inputs.app_name}} #${{ steps.values.outputs.buildnumber }} status`}"
