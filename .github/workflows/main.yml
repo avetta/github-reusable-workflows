@@ -494,7 +494,7 @@ jobs:
         continue-on-error: true
         if: "${{ steps.branch_check_demo.outputs.env_name != '' &&  github.event_name != 'pull_request'}}"
         run: |  
-          environment=${{ steps.branch_check.outputs.env_name }}
+          environment=${{ steps.branch_check_demo.outputs.env_name }}
           if [ -z $environment ]; then
             echo "Deployment configuration not found"
           else
