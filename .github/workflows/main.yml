@@ -478,7 +478,7 @@ jobs:
            
       - name: Trigger your-awesome-job-name job
         continue-on-error: true
-        if: "${{ steps.branch_check.outputs.env_name != '' &&  github.event_name != 'pull_request'}}"
+        if: "${{ steps.branch_check.outputs.env_name != '' &&  github.event_name != 'pull_request' && steps.branch_check.outputs.deploytodemo == ''}}"
         run: |  
           environment=${{ steps.branch_check.outputs.env_name }}
           if [ -z $environment ]; then
@@ -490,6 +490,20 @@ jobs:
  
              
           fi
+      - name: Trigger your-awesome-job
+        continue-on-error: true
+        if: "${{ steps.branch_check_demo.outputs.env_name != '' &&  github.event_name != 'pull_request'}}"
+        run: |  
+          environment=${{ steps.branch_check.outputs.env_name }}
+          if [ -z $environment ]; then
+            echo "Deployment configuration not found"
+          else
+            curl -s ${{secrets.jenkins_url}}/job/${{ steps.branch_check.outputs.env_name }}-deploy-generic/buildWithParameters \
+             --user ${{inputs.jenkins_user}}:${{secrets.jenkins_password}} \
+             --data ContainerName=${{inputs.app_name}} --data DockerHubTag=${{inputs.docker_tag}}
+ 
+             
+          fi    
           
       - name: Microsoft Teams Notification
         if: "${{ steps.values.outputs.teamswebhook != '' && always()}}"
