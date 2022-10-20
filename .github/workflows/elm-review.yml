@@ -323,15 +323,9 @@ jobs:
           npx elm-format src --validate
           npm run build
 
-      - name: Add elm-review, elm and elm-format to path
-        if: "${{ steps.values.outputs.ui == 'true'}}"
-        run: npm bin >> $GITHUB_PATH
-
       - name: Run elm-review
         if: "${{ steps.values.outputs.ui == 'true'}}"
-        uses: sparksp/elm-review-action@v1.0.4
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx elm-review
 
       - name: code coverage
         if: "${{ steps.values.outputs.code_coverage == 'true'}}"
