@@ -316,13 +316,14 @@ jobs:
 
       - name: Run list and prettier and elm-format and run build
         if: "${{ steps.values.outputs.ui == 'true'}}"
-        steps:
-          - run: npm run lint
-          - run: npx prettier --check '{config,server,src/static}/**/*.{css,html,js,json,ts}'
-          - run: npx elm-format src --validate
-          - run: npm run build
-          - name: elm-review
-            uses: sparksp/elm-review-action@v1.0.6
+        run: |
+          npm run lint
+          npx prettier --check '{config,server,src/static}/**/*.{css,html,js,json,ts}'
+          npx elm-format src --validate
+          npm run build
+
+      - name: Run elm-review
+        uses: sparksp/elm-review-action@v1.0.6
 
       - name: code coverage
         if: "${{ steps.values.outputs.code_coverage == 'true'}}"
