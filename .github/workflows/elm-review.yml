@@ -323,8 +323,13 @@ jobs:
           npx elm-format src --validate
           npm run build
 
+      - run: yarn --frozen-lockfile
+      - name: Add elm-review, elm and elm-format to path
+        run: yarn bin >> $GITHUB_PATH
       - name: Run elm-review
-        run: npx elm-review
+        uses: sparksp/elm-review-action@v1.0.4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: code coverage
         if: "${{ steps.values.outputs.code_coverage == 'true'}}"
