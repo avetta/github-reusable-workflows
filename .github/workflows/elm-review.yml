@@ -247,6 +247,7 @@ jobs:
 
       - name: Cache ~/.elm
         if: "${{ steps.values.outputs.ui == 'true'}}"
+        id: cache-elm
         uses: actions/cache@v2
         with:
           path: ~/.elm
@@ -323,9 +324,7 @@ jobs:
           npm run build
 
       - name: Run elm-review
-        uses: sparksp/elm-review-action@v1.0.6
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx elm-review
 
       - name: code coverage
         if: "${{ steps.values.outputs.code_coverage == 'true'}}"
