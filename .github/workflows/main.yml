@@ -244,7 +244,15 @@ jobs:
         with:
           path: node_modules
           key: node-modules-${{ hashFiles('package-lock.json') }}
-          
+
+      - name: Cache ~/.elm
+        if: "${{ steps.values.outputs.ui == 'true'}}"
+        id: cache-elm
+        uses: actions/cache@v2
+        with:
+          path: ~/.elm
+          key: elm-${{ hashFiles('elm.json', 'review/elm.json') }}
+
       - name: Cache Node Modules
         if: "${{ steps.values.outputs.envconfigservice == 'true'}}"
         id: cache-node
@@ -314,7 +322,11 @@ jobs:
           npx prettier --check '{config,server,src/static}/**/*.{css,html,js,json,ts}'
           npx elm-format src --validate
           npm run build
-          
+
+      - name: Run elm-review
+        if: "${{ steps.values.outputs.ui == 'true'}}"
+        run: npx elm-review
+
       - name: code coverage
         if: "${{ steps.values.outputs.code_coverage == 'true'}}"
         run: |
