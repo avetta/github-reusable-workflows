@@ -168,22 +168,21 @@ jobs:
       - name: setting values for steps
         id: values
         run: |
-          echo '::set-output name=ui::'${{inputs.ui}} 
-          echo '::set-output name=envconfigservice::'${{inputs.envconfigservice}}
-          echo '::set-output name=java::'${{inputs.java}}
-          echo '::set-output name=jobservice::'${{inputs.jobservice}}
-          echo '::set-output name=branch_name::'${{inputs.branch_name}}
-          echo '::set-output name=github_tag::'${{inputs.github_tag}}
-          echo '::set-output name=java::'${{inputs.java}}
-          echo '::set-output name=docker_stage::'${{inputs.docker_stage}}
-          echo '::set-output name=code_coverage::'${{inputs.code_coverage}}
-          echo '::set-output name=npm_test::'${{inputs.npm_test}}
-          echo '::set-output name=cache_sbt::'${{inputs.cache_sbt}}
-          echo '::set-output name=mondb_wd::'${{inputs.mondb_wd}}
-          echo '::set-output name=mondb_wd_scoring::'${{inputs.mondb_wd_scoring}}
-          echo '::set-output name=deploytodemo::'${{inputs.deploytodemo}}
-          echo '::set-output name=buildnumber::'${{inputs.GITHUB_BUILD_NUMBER}}
-          echo '::set-output name=teamswebhook::'${{secrets.MSTEAMS_WEBHOOK}}
+          echo "ui=${{inputs.ui}}" >> $GITHUB_OUTPUT
+          echo "envconfigservice=${{inputs.envconfigservice}}" >> $GITHUB_OUTPUT
+          echo "java=${{inputs.java}}" >> $GITHUB_OUTPUT
+          echo "jobservice=${{inputs.jobservice}}" >> $GITHUB_OUTPUT
+          echo "branch_name=${{inputs.branch_name}}" >> $GITHUB_OUTPUT
+          echo "github_tag=${{inputs.github_tag}}" >> $GITHUB_OUTPUT
+          echo "docker_stage=${{inputs.docker_stage}}" >> $GITHUB_OUTPUT
+          echo "code_coverage=${{inputs.code_coverage}}" >> $GITHUB_OUTPUT
+          echo "npm_test=${{inputs.npm_test}}" >> $GITHUB_OUTPUT
+          echo "cache_sbt=${{inputs.cache_sbt}}" >> $GITHUB_OUTPUT
+          echo "mondb_wd=${{inputs.mondb_wd}}" >> $GITHUB_OUTPUT
+          echo "mondb_wd_scoring=${{inputs.mondb_wd_scoring}}" >> $GITHUB_OUTPUT
+          echo "deploytodemo=${{inputs.deploytodemo}}" >> $GITHUB_OUTPUT
+          echo "buildnumber=${{inputs.buildnumber}}" >> $GITHUB_OUTPUT
+          echo "teamswebhook=${{secrets.MSTEAMS_WEBHOOK}}" >> $GITHUB_OUTPUT
           
       - name: Some check on branch
         id: branch_check
