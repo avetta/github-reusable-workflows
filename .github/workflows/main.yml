@@ -165,25 +165,6 @@ jobs:
         with:
           fetch-depth: 0    
           
-     # - name: setting values for steps
-      #  id: values
-       # run: |
-        #  echo '::set-output name=ui::'${{inputs.ui}} 
-         # echo '::set-output name=envconfigservice::'${{inputs.envconfigservice}}
-          #echo '::set-output name=java::'${{inputs.java}}
-          #echo '::set-output name=jobservice::'${{inputs.jobservice}}
-          #echo '::set-output name=branch_name::'${{inputs.branch_name}}
-          #echo '::set-output name=github_tag::'${{inputs.github_tag}}
-          #echo '::set-output name=java::'${{inputs.java}}
-          #echo '::set-output name=docker_stage::'${{inputs.docker_stage}}
-          #echo '::set-output name=code_coverage::'${{inputs.code_coverage}}
-          #echo '::set-output name=npm_test::'${{inputs.npm_test}}
-          #echo '::set-output name=cache_sbt::'${{inputs.cache_sbt}}
-          #echo '::set-output name=mondb_wd::'${{inputs.mondb_wd}}
-          #echo '::set-output name=mondb_wd_scoring::'${{inputs.mondb_wd_scoring}}
-          #echo '::set-output name=deploytodemo::'${{inputs.deploytodemo}}
-          #echo '::set-output name=buildnumber::'${{inputs.GITHUB_BUILD_NUMBER}}
-          #echo '::set-output name=teamswebhook::'${{secrets.MSTEAMS_WEBHOOK}}
           
       - name: setting values for steps
         id: values
@@ -211,22 +192,18 @@ jobs:
           then
                 echo "\${{ steps.values.outputs.github_tag }} is empty"
           else
-                echo "::set-output name=env_name::qa"
+                echo "env_name=qa" >> $GITHUB_OUTPUT
           fi
           if [ "${{ steps.values.outputs.branch_name }}" = "feature" ]; then
-            #echo "::set-output name=env_name::dev"
             echo "env_name=dev" >> $GITHUB_OUTPUT
           fi
           if [ "${{ steps.values.outputs.branch_name }}" = "nightly" ]; then
-            #echo "::set-output name=env_name::int"
             echo "env_name=int" >> $GITHUB_OUTPUT
           fi
           if [ "${{ steps.values.outputs.branch_name }}" = "release" ]; then
-            #echo "::set-output name=env_name::qa"
             echo "env_name=qa" >> $GITHUB_OUTPUT
           fi
           if [ "${{ steps.values.outputs.branch_name }}" = "patch" ]; then
-            #echo "::set-output name=env_name::qa"
             echo "env_name=qa" >> $GITHUB_OUTPUT
           fi 
           
@@ -235,7 +212,6 @@ jobs:
         id: branch_check_demo
         run: |
           if [ "${{ steps.values.outputs.branch_name }}" = "main" ]; then
-            #echo "::set-output name=env_name::demo"
             echo "env_name=demo" >> $GITHUB_OUTPUT
           fi    
             
