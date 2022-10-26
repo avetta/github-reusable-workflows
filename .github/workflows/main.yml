@@ -368,7 +368,8 @@ jobs:
             cat $propertiesFile  
             ls -ltr ./conf
             echo ${{inputs.embed_apm}}
-            echo '::set-output name=embed_apm::'${{inputs.embed_apm}}    
+            #echo '::set-output name=embed_apm::'${{inputs.embed_apm}} 
+            echo "embed_apm=${{inputs.embed_apm}}" >> $GITHUB_OUTPUT
           
       - name: stage docker file
         if: "${{ steps.values.outputs.docker_stage == 'true'}}"
