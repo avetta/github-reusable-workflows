@@ -214,16 +214,20 @@ jobs:
                 echo "::set-output name=env_name::qa"
           fi
           if [ "${{ steps.values.outputs.branch_name }}" = "feature" ]; then
-            echo "::set-output name=env_name::dev"
+            #echo "::set-output name=env_name::dev"
+            echo "env_name=dev" >> $GITHUB_OUTPUT
           fi
           if [ "${{ steps.values.outputs.branch_name }}" = "nightly" ]; then
-            echo "::set-output name=env_name::int"
+            #echo "::set-output name=env_name::int"
+            echo "env_name=int" >> $GITHUB_OUTPUT
           fi
           if [ "${{ steps.values.outputs.branch_name }}" = "release" ]; then
-            echo "::set-output name=env_name::qa"
+            #echo "::set-output name=env_name::qa"
+            echo "env_name=qa" >> $GITHUB_OUTPUT
           fi
           if [ "${{ steps.values.outputs.branch_name }}" = "patch" ]; then
-            echo "::set-output name=env_name::qa"
+            #echo "::set-output name=env_name::qa"
+            echo "env_name=qa" >> $GITHUB_OUTPUT
           fi 
           
       - name: Some check on branch
@@ -231,7 +235,8 @@ jobs:
         id: branch_check_demo
         run: |
           if [ "${{ steps.values.outputs.branch_name }}" = "main" ]; then
-            echo "::set-output name=env_name::demo"
+            #echo "::set-output name=env_name::demo"
+            echo "env_name=demo" >> $GITHUB_OUTPUT
           fi    
             
           
