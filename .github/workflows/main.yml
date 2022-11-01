@@ -182,7 +182,7 @@ jobs:
           echo "mondb_wd=${{inputs.mondb_wd}}" >> $GITHUB_OUTPUT
           echo "mondb_wd_scoring=${{inputs.mondb_wd_scoring}}" >> $GITHUB_OUTPUT
           echo "deploytodemo=${{inputs.deploytodemo}}" >> $GITHUB_OUTPUT
-          echo "buildnumber=${{inputs.buildnumber}}" >> $GITHUB_OUTPUT
+          echo "buildnumber=${{inputs.GITHUB_BUILD_NUMBER}}" >> $GITHUB_OUTPUT
           echo "teamswebhook=${{secrets.MSTEAMS_WEBHOOK}}" >> $GITHUB_OUTPUT    
           
       - name: Some check on branch
