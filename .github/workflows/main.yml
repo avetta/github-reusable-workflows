@@ -150,6 +150,12 @@ on:
       INPUTCONFIGSERVICE_MONGO_AUTHENTICATION:
         required: false 
       MONGODB_ARCHIVE:
+        required: false
+      EXPERIAN_URI:
+        required: false
+      EXPERIAN_CONNECT_ACCOUNT_ID:
+        required: false
+      EXPERIAN_CONNECT_USER_ID:
         required: false  
         
 jobs:
@@ -334,6 +340,16 @@ jobs:
           export JFROG_PASSWORD=${{secrets.JFROG_PASSWORD}}
           export JFROG_RO_USER=${{secrets.JFROG_USERNAME}}
           export JFROG_RO_PASSWORD=${{secrets.JFROG_PASSWORD}}
+          export EXPERIAN_URI=${{secrets.EXPERIAN_URI}}
+          export EXPERIAN_CONNECT_ACCOUNT_ID=${{secrets.EXPERIAN_CONNECT_ACCOUNT_ID}}
+          export EXPERIAN_CONNECT_USER_ID=${{secrets.EXPERIAN_CONNECT_USER_ID}}
+          export SCORINGSERVICE_HOST=localhost
+          export ADMINSERVICE_HOST=localhost
+          export NOTIFICATIONSERVICE_HOST=localhost
+          export EXPERIAN_MONGODB_URI=mongodb://localhost
+          export AVETTA_ENV=unittest
+          export EXPERIAN_SUBSCRIBER_SUBCODE=notused
+          export EXPERIAN_PORTFOLIO_SUBCODE=notused
           ${{inputs.scalafmtCheckAll}}
           ${{inputs.clean_coverage}}
           ${{inputs.coverage_report}}
