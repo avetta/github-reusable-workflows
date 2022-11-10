@@ -204,10 +204,18 @@ jobs:
             echo "env_name=dev" >> $GITHUB_OUTPUT
           fi
           if [ "${{ steps.values.outputs.branch_name }}" = "nightly" ]; then
-            echo "env_name=int" >> $GITHUB_OUTPUT
+            if [["${{ inputs.app_name }}" == "wm-"* ]] then
+              echo "env_name=qa" >> $GITHUB_OUTPUT
+            else
+              echo "env_name=int" >> $GITHUB_OUTPUT
+            fi
           fi
           if [ "${{ steps.values.outputs.branch_name }}" = "release" ]; then
-            echo "env_name=qa" >> $GITHUB_OUTPUT
+            if [["${{ inputs.app_name }}" == "wm-"* ]] then
+              echo "env_name=rc" >> $GITHUB_OUTPUT
+            else
+              echo "env_name=qa" >> $GITHUB_OUTPUT
+            fi
           fi
           if [ "${{ steps.values.outputs.branch_name }}" = "patch" ]; then
             echo "env_name=qa" >> $GITHUB_OUTPUT
