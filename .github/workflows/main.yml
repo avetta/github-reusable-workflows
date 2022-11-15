@@ -467,13 +467,14 @@ jobs:
       - name: custom EmbedAPM        
         if: "${{ steps.setversion.outputs.embed_apm == 'custom' &&  github.event_name != 'pull_request'}}"
         run: |
-          curl https://download.newrelic.com/newrelic/java-agent/newrelic-agent/7.5.0/newrelic-java-7.5.0.zip --output newrelic-java-7.5.0.zip
-          unzip newrelic-java-7.5.0.zip
-          curl https://github.com/newrelic/newrelic-java-agent/suites/8554335689/artifacts/382130524 --output newrelic.jar
+          #curl https://download.newrelic.com/newrelic/java-agent/newrelic-agent/7.5.0/newrelic-java-7.5.0.zip --output newrelic-java-7.5.0.zip
+          curl https://download.newrelic.com/newrelic/java-agent/newrelic-agent/current/newrelic-java-7.11.0.zip --output newrelic-java-7.11.0.zip
+          unzip newrelic-java-7.11.0.zip
+          #curl https://github.com/newrelic/newrelic-java-agent/suites/8554335689/artifacts/382130524 --output newrelic.jar
           export Dockerfile="./Dockerfile"
           echo "FROM pics/${{inputs.app_name}}:${{inputs.docker_tag}}" | sudo tee -a $Dockerfile
           echo "ENV JAVA_OPTS="-javaagent:/opt/docker/lib/newrelic.jar"" | sudo tee -a $Dockerfile
-          echo "ADD ./newrelic.jar /opt/docker/lib/" | sudo tee -a $Dockerfile
+          echo "ADD ./newrelic/newrelic.jar /opt/docker/lib/" | sudo tee -a $Dockerfile
           echo "ADD ./newrelic/newrelic.yml /opt/docker/lib/" | sudo tee -a $Dockerfile
           echo "RUN chmod u+w /opt/docker/lib/" | sudo tee -a $Dockerfile
           ls -ltr
