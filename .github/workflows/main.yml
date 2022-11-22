@@ -524,6 +524,8 @@ jobs:
           environment=${{ steps.branch_check.outputs.env_name }}
           if [ -z $environment ]; then
             echo "Deployment configuration not found"
+          elif [[ ${{ inputs.app_name }} == "wm-linux" ]]; then
+            echo "wm-linux not configured to deploy"
           elif [[ ${{ inputs.app_name }} == *"wm-"* ]]; then
             curl -s ${{secrets.jenkins_url}}/job/${{ steps.branch_check.outputs.env_name }}-deploy-wm/buildWithParameters \
              --user ${{inputs.jenkins_user}}:${{secrets.jenkins_password}} \
@@ -542,6 +544,8 @@ jobs:
           environment=${{ steps.branch_check_demo.outputs.env_name }}
           if [ -z $environment ]; then
             echo "Deployment configuration not found"
+          elif [[ ${{ inputs.app_name }} == "wm-linux" ]]; then
+            echo "wm-linux not configured to deploy"
           else
             curl -s ${{secrets.jenkins_url}}/job/${{ steps.branch_check_demo.outputs.env_name }}-deploy-generic/buildWithParameters \
              --user ${{inputs.jenkins_user}}:${{secrets.jenkins_password}} \
