@@ -329,7 +329,10 @@ jobs:
 
       - name: Run elm-test
         if: "${{ steps.values.outputs.ui == 'true'}}"
-        run: npx elm-test
+        run: |
+          if [ "${{ steps.values.outputs.branch_name }}" = "feature" ]; then
+            npx elm-test
+          fi    
 
       - name: code coverage
         if: "${{ steps.values.outputs.code_coverage == 'true'}}"
