@@ -341,6 +341,10 @@ jobs:
         if: "${{ steps.values.outputs.ui == 'true'}}"
         run: npx elm-review
 
+      - name: Run elm-test
+         if: "${{ steps.values.outputs.ui == 'true'}}"
+         run: npx elm-test
+
       - name: code coverage
         if: "${{ steps.values.outputs.code_coverage == 'true'}}"
         run: |
