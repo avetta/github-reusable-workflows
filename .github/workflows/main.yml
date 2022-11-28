@@ -458,8 +458,8 @@ jobs:
           echo "FROM pics/${{inputs.app_name}}:${{inputs.docker_tag}}" | sudo tee -a $Dockerfile
           echo "ENV JAVA_OPTS="-javaagent:/opt/docker/lib/newrelic.jar"" | sudo tee -a $Dockerfile
           echo "ADD ./newrelic/newrelic.jar /opt/docker/lib/" | sudo tee -a $Dockerfile
-          #echo "ADD ./newrelic/newrelic.yml /opt/docker/lib/" | sudo tee -a $Dockerfile
-          echo "ADD ./conf/newrelic.yml /opt/docker/lib/" | sudo tee -a $Dockerfile
+          echo "ADD ./newrelic/newrelic.yml /opt/docker/lib/" | sudo tee -a $Dockerfile
+          #echo "ADD ./conf/newrelic.yml /opt/docker/lib/" | sudo tee -a $Dockerfile
           echo "RUN chmod u+w /opt/docker/lib/" | sudo tee -a $Dockerfile
           ls -ltr
           cat ./conf/serviceVersion.properties
