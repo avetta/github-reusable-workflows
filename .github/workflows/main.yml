@@ -456,8 +456,8 @@ jobs:
       - name: upgrade EmbedAPM        
         if: "${{ steps.setversion.outputs.embed_apm == 'enable' &&  github.event_name != 'pull_request'}}"
         run: |
-          curl https://download.newrelic.com/newrelic/java-agent/newrelic-agent/${{inputs.apm_version}}/newrelic-java-${{inputs.apm_version}}.zip --output newrelic-java-${{inputs.apm_version}}.zip
-          unzip newrelic-java-${{inputs.apm_version}}.zip
+          curl https://download.newrelic.com/newrelic/java-agent/newrelic-agent/7.11.1/newrelic-java-7.11.1.zip --output newrelic-java-7.11.1.zip
+          unzip newrelic-java-7.11.1.zip
           export Dockerfile="./Dockerfile"
           echo "FROM pics/${{inputs.app_name}}:${{inputs.docker_tag}}" | sudo tee -a $Dockerfile
           echo "ENV JAVA_OPTS="-javaagent:/opt/docker/lib/newrelic.jar"" | sudo tee -a $Dockerfile
