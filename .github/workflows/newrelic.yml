@@ -58,6 +58,10 @@ on:
         description: ui
         required: false
         type: string
+      envconfigservice:
+        description: ui
+        required: false
+        type: string  
       npm_test:
         description: npm_test
         required: false
@@ -106,6 +110,14 @@ on:
         description: coverage_report
         required: false
         type: string
+      deploytodemo:
+        description: deploytodemo
+        required: false
+        type: string
+      apm_version:
+        description: apm_version
+        required: false
+        type: string  
         
         
     secrets:
@@ -122,6 +134,8 @@ on:
       JFROG_USERNAME:
         required: false
       JFROG_PASSWORD:
+        required: false
+      MSTEAMS_WEBHOOK:
         required: false
       MONGODB_WD:
         required: false
@@ -140,6 +154,12 @@ on:
       INPUTCONFIGSERVICE_MONGO_AUTHENTICATION:
         required: false 
       MONGODB_ARCHIVE:
+        required: false
+      EXPERIAN_URI:
+        required: false
+      EXPERIAN_CONNECT_ACCOUNT_ID:
+        required: false
+      EXPERIAN_CONNECT_USER_ID:
         required: false  
         
 jobs:
@@ -155,21 +175,25 @@ jobs:
         with:
           fetch-depth: 0    
           
+          
       - name: setting values for steps
         id: values
         run: |
-          echo '::set-output name=ui::'${{inputs.ui}} 
-          echo '::set-output name=java::'${{inputs.java}}
-          echo '::set-output name=jobservice::'${{inputs.jobservice}}
-          echo '::set-output name=branch_name::'${{inputs.branch_name}}
-          echo '::set-output name=github_tag::'${{inputs.github_tag}}
-          echo '::set-output name=java::'${{inputs.java}}
-          echo '::set-output name=docker_stage::'${{inputs.docker_stage}}
-          echo '::set-output name=code_coverage::'${{inputs.code_coverage}}
-          echo '::set-output name=npm_test::'${{inputs.npm_test}}
-          echo '::set-output name=cache_sbt::'${{inputs.cache_sbt}}
-          echo '::set-output name=mondb_wd::'${{inputs.mondb_wd}}
-          echo '::set-output name=mondb_wd_scoring::'${{inputs.mondb_wd_scoring}}
+          echo "ui=${{inputs.ui}}" >> $GITHUB_OUTPUT
+          echo "envconfigservice=${{inputs.envconfigservice}}" >> $GITHUB_OUTPUT
+          echo "java=${{inputs.java}}" >> $GITHUB_OUTPUT
+          echo "jobservice=${{inputs.jobservice}}" >> $GITHUB_OUTPUT
+          echo "branch_name=${{inputs.branch_name}}" >> $GITHUB_OUTPUT
+          echo "github_tag=${{inputs.github_tag}}" >> $GITHUB_OUTPUT
+          echo "docker_stage=${{inputs.docker_stage}}" >> $GITHUB_OUTPUT
+          echo "code_coverage=${{inputs.code_coverage}}" >> $GITHUB_OUTPUT
+          echo "npm_test=${{inputs.npm_test}}" >> $GITHUB_OUTPUT
+          echo "cache_sbt=${{inputs.cache_sbt}}" >> $GITHUB_OUTPUT
+          echo "mondb_wd=${{inputs.mondb_wd}}" >> $GITHUB_OUTPUT
+          echo "mondb_wd_scoring=${{inputs.mondb_wd_scoring}}" >> $GITHUB_OUTPUT
+          echo "deploytodemo=${{inputs.deploytodemo}}" >> $GITHUB_OUTPUT
+          echo "buildnumber=${{inputs.GITHUB_BUILD_NUMBER}}" >> $GITHUB_OUTPUT
+          echo "teamswebhook=${{secrets.MSTEAMS_WEBHOOK}}" >> $GITHUB_OUTPUT    
           
       - name: Some check on branch
         id: branch_check
@@ -178,20 +202,36 @@ jobs:
           then
                 echo "\${{ steps.values.outputs.github_tag }} is empty"
           else
-                echo "::set-output name=env_name::qa"
+                echo "env_name=qa" >> $GITHUB_OUTPUT
           fi
-          if [ "${{ steps.values.outputs.branch_name }}" = "GitHub" ]; then
-            echo "::set-output name=env_name::dev"
+          if [ "${{ steps.values.outputs.branch_name }}" = "feature" ]; then
+            echo "env_name=dev" >> $GITHUB_OUTPUT
           fi
           if [ "${{ steps.values.outputs.branch_name }}" = "nightly" ]; then
-            echo "::set-output name=env_name::int"
+            if [[ "${{ inputs.app_name }}" == *"wm-"* ]]; then
+              echo "env_name=qa" >> $GITHUB_OUTPUT
+            else
+              echo "env_name=int" >> $GITHUB_OUTPUT
+            fi
           fi
           if [ "${{ steps.values.outputs.branch_name }}" = "release" ]; then
-            echo "::set-output name=env_name::qa"
+            if [[ "${{ inputs.app_name }}" == *"wm-"* ]]; then
+              echo "env_name=rc" >> $GITHUB_OUTPUT
+            else
+              echo "env_name=qa" >> $GITHUB_OUTPUT
+            fi
           fi
           if [ "${{ steps.values.outputs.branch_name }}" = "patch" ]; then
-            echo "::set-output name=env_name::qa"
+            echo "env_name=qa" >> $GITHUB_OUTPUT
           fi 
+          
+      - name: Some check on branch
+        if: "${{ steps.values.outputs.deploytodemo == 'true'}}"
+        id: branch_check_demo
+        run: |
+          if [ "${{ steps.values.outputs.branch_name }}" = "main" ]; then
+            echo "env_name=demo" >> $GITHUB_OUTPUT
+          fi    
             
           
       - name: Setup Java and Scala
@@ -207,6 +247,14 @@ jobs:
           node-version: ${{inputs.node-version}}
           cache: 'npm'
           
+      - name: Use Node.js ${{inputs.node-version}}
+        if: "${{ steps.values.outputs.envconfigservice == 'true'}}"
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{inputs.node-version}}
+          cache: 'npm' 
+          cache-dependency-path: ui/yarn.lock
+          
       - name: Cache Node Modules
         if: "${{ steps.values.outputs.ui == 'true'}}"
         id: cache-node-modules
@@ -214,6 +262,22 @@ jobs:
         with:
           path: node_modules
           key: node-modules-${{ hashFiles('package-lock.json') }}
+
+      - name: Cache ~/.elm
+        if: "${{ steps.values.outputs.ui == 'true'}}"
+        id: cache-elm
+        uses: actions/cache@v2
+        with:
+          path: ~/.elm
+          key: elm-${{ hashFiles('elm.json', 'review/elm.json') }}
+
+      - name: Cache Node Modules
+        if: "${{ steps.values.outputs.envconfigservice == 'true'}}"
+        id: cache-node
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: node-modules-${{ hashFiles('package-lock.json') }}    
           
       - name: Cache sbt
         if: "${{ steps.values.outputs.cache_sbt == 'true'}}"
@@ -256,9 +320,18 @@ jobs:
           ${PWD}/${{secrets.MONGODB_WD}}/bin/mongo scoring --eval 'db.createUser({user:"${{secrets.INPUTCONFIGSERVICE_MONGO_USER}}",pwd:"${{secrets.INPUTCONFIGSERVICE_MONGO_PWD}}",roles:[{role:"readWrite",db:"scoring"}]});'
           ${PWD}/${{secrets.MONGODB_WD}}/bin/mongo input_config --eval 'db.createUser({user:"${{secrets.INPUTCONFIGSERVICE_MONGO_USER}}",pwd:"${{secrets.INPUTCONFIGSERVICE_MONGO_PWD}}",roles:[{role:"readWrite",db:"input_config"}]})'
        
+     
       - name: npm install
         if: "${{ steps.cache.outputs.cache-hit != 'true' &&  steps.values.outputs.ui == 'true'}}"
         run: npm install
+        
+      - name: npm install in custom dir
+        if: "${{ steps.cache.outputs.cache-hit != 'true' &&  steps.values.outputs.envconfigservice == 'true'}}"
+        run: |
+          cd ui 
+          npm install
+          npm run build
+          cd ..
 
       - name: Run list and prettier and elm-format and run build
         if: "${{ steps.values.outputs.ui == 'true'}}"
@@ -267,7 +340,11 @@ jobs:
           npx prettier --check '{config,server,src/static}/**/*.{css,html,js,json,ts}'
           npx elm-format src --validate
           npm run build
-          
+
+      - name: Run elm-review
+        if: "${{ steps.values.outputs.ui == 'true'}}"
+        run: npx elm-review
+
       - name: code coverage
         if: "${{ steps.values.outputs.code_coverage == 'true'}}"
         run: |
@@ -275,6 +352,19 @@ jobs:
           export JFROG_PASSWORD=${{secrets.JFROG_PASSWORD}}
           export JFROG_RO_USER=${{secrets.JFROG_USERNAME}}
           export JFROG_RO_PASSWORD=${{secrets.JFROG_PASSWORD}}
+          export EXPERIAN_URI="https://sandbox-us-api.experian.com"
+          export EXPERIAN_CONNECT_ACCOUNT_ID="0000000000000000000001"
+          export EXPERIAN_CONNECT_USER_ID="0000000000000000000002"
+          #export EXPERIAN_URI=${{secrets.EXPERIAN_URI}}
+          #export EXPERIAN_CONNECT_ACCOUNT_ID=${{secrets.EXPERIAN_CONNECT_ACCOUNT_ID}}
+          #export EXPERIAN_CONNECT_USER_ID=${{secrets.EXPERIAN_CONNECT_USER_ID}}
+          export SCORINGSERVICE_HOST="localhost"
+          export ADMINSERVICE_HOST="localhost"
+          export NOTIFICATIONSERVICE_HOST="localhost"
+          export EXPERIAN_MONGODB_URI="mongodb://localhost"
+          export AVETTA_ENV="unittest"
+          export EXPERIAN_SUBSCRIBER_SUBCODE="notused"
+          export EXPERIAN_PORTFOLIO_SUBCODE="notused"
           ${{inputs.scalafmtCheckAll}}
           ${{inputs.clean_coverage}}
           ${{inputs.coverage_report}}
@@ -309,7 +399,8 @@ jobs:
             cat $propertiesFile  
             ls -ltr ./conf
             echo ${{inputs.embed_apm}}
-            echo '::set-output name=embed_apm::'${{inputs.embed_apm}}    
+            #echo '::set-output name=embed_apm::'${{inputs.embed_apm}} 
+            echo "embed_apm=${{inputs.embed_apm}}" >> $GITHUB_OUTPUT
           
       - name: stage docker file
         if: "${{ steps.values.outputs.docker_stage == 'true'}}"
@@ -339,7 +430,7 @@ jobs:
           tags: pics/${{inputs.app_name}}:${{inputs.docker_tag}}
           
       - name: Build image
-        if: "${{ steps.setversion.outputs.embed_apm == 'true' &&  github.event_name != 'pull_request'}}"
+        if: "${{ steps.setversion.outputs.embed_apm != 'false' &&  github.event_name != 'pull_request'}}"
         id: docker_build2
         uses: docker/build-push-action@v2
         with:
@@ -347,26 +438,54 @@ jobs:
           context: ${{inputs.docker_context}}
           push: false
            # Note: tags has to be all lower-case
-          tags: pics/${{inputs.app_name}}:${{inputs.docker_tag}}    
-          
-      
+          tags: pics/${{inputs.app_name}}:${{inputs.docker_tag}} 
+              
       - name: EmbedAPM        
         if: "${{ steps.setversion.outputs.embed_apm == 'true' &&  github.event_name != 'pull_request'}}"
         run: |
-          curl https://download.newrelic.com/newrelic/java-agent/newrelic-agent/7.9.0/newrelic-java-7.9.0.zip --output newrelic-java-7.9.0.zip
-          unzip newrelic-java-7.9.0.zip
+          curl https://download.newrelic.com/newrelic/java-agent/newrelic-agent/7.5.0/newrelic-java-7.5.0.zip --output newrelic-java-7.5.0.zip
+          unzip newrelic-java-7.5.0.zip
           export Dockerfile="./Dockerfile"
           echo "FROM pics/${{inputs.app_name}}:${{inputs.docker_tag}}" | sudo tee -a $Dockerfile
           echo "ENV JAVA_OPTS="-javaagent:/opt/docker/lib/newrelic.jar"" | sudo tee -a $Dockerfile
           echo "ADD ./newrelic/newrelic.jar /opt/docker/lib/" | sudo tee -a $Dockerfile
-          #echo "ADD ./newrelic/newrelic.yml /opt/docker/lib/" | sudo tee -a $Dockerfile
-          echo "ADD ./conf/newrelic.yml /opt/docker/lib/" | sudo tee -a $Dockerfile
+          echo "ADD ./newrelic/newrelic.yml /opt/docker/lib/" | sudo tee -a $Dockerfile
+          ls -ltr
+          cat ./conf/serviceVersion.properties
+          
+      - name: upgrade EmbedAPM        
+        if: "${{ steps.setversion.outputs.embed_apm == 'enable' &&  github.event_name != 'pull_request'}}"
+        run: |
+          curl https://download.newrelic.com/newrelic/java-agent/newrelic-agent/${{inputs.apm_version}}/newrelic-java-${{inputs.apm_version}}.zip --output newrelic-java-${{inputs.apm_version}}.zip
+          unzip newrelic-java-${{inputs.apm_version}}.zip
+          export Dockerfile="./Dockerfile"
+          echo "FROM pics/${{inputs.app_name}}:${{inputs.docker_tag}}" | sudo tee -a $Dockerfile
+          echo "ENV JAVA_OPTS="-javaagent:/opt/docker/lib/newrelic.jar"" | sudo tee -a $Dockerfile
+          echo "ADD ./newrelic/newrelic.jar /opt/docker/lib/" | sudo tee -a $Dockerfile
+          echo "ADD ./newrelic/newrelic.yml /opt/docker/lib/" | sudo tee -a $Dockerfile
+          #echo "ADD ./conf/newrelic.yml /opt/docker/lib/" | sudo tee -a $Dockerfile
           echo "RUN chmod u+w /opt/docker/lib/" | sudo tee -a $Dockerfile
           ls -ltr
           cat ./conf/serviceVersion.properties
+          
+      - name: custom EmbedAPM        
+        if: "${{ steps.setversion.outputs.embed_apm == 'custom' &&  github.event_name != 'pull_request'}}"
+        run: |
+          #curl https://download.newrelic.com/newrelic/java-agent/newrelic-agent/7.5.0/newrelic-java-7.5.0.zip --output newrelic-java-7.5.0.zip
+          #curl https://download.newrelic.com/newrelic/java-agent/newrelic-agent/current/newrelic-java-7.11.0.zip --output newrelic-java-7.11.0.zip
+          #unzip newrelic-java-7.11.0.zip
+          #curl https://github.com/newrelic/newrelic-java-agent/suites/8554335689/artifacts/382130524 --output newrelic.jar
+          export Dockerfile="./Dockerfile"
+          echo "FROM pics/${{inputs.app_name}}:${{inputs.docker_tag}}" | sudo tee -a $Dockerfile
+          echo "ENV JAVA_OPTS="-javaagent:/opt/docker/lib/newrelic.jar"" | sudo tee -a $Dockerfile
+          echo "ADD ./newrelic.jar /opt/docker/lib/" | sudo tee -a $Dockerfile
+          echo "ADD ./newrelic.yml /opt/docker/lib/" | sudo tee -a $Dockerfile
+          echo "RUN chmod u+w /opt/docker/lib/" | sudo tee -a $Dockerfile
+          ls -ltr
+          cat ./conf/serviceVersion.properties     
       
       - name: Build image and push to DockerHub
-        if: "${{ steps.setversion.outputs.embed_apm == 'true' &&  github.event_name != 'pull_request'}}"
+        if: "${{ steps.setversion.outputs.embed_apm != 'false' &&  github.event_name != 'pull_request'}}"
         id: docker_build_push
         uses: docker/build-push-action@v2
         with:
@@ -375,24 +494,84 @@ jobs:
           push: true
            # Note: tags has to be all lower-case
           tags: pics/${{inputs.app_name}}:${{inputs.docker_tag}}
-          
+              
       - name: Run npm test
         if: "${{ steps.values.outputs.npm_test == 'true'}}"
         run: |
           npm install
           npm run test
-          npm prune --production      
+          npm prune --production 
           
+      - name: Run npm test
+        if: "${{ steps.values.outputs.envconfigservice == 'true'}}"
+        run: |
+          npm install
+          npm prune --production    
+          
+      #- name: Trigger jenkins job
+       # if: "${{ steps.branch_check.outputs.env_name != '' &&  github.event_name != 'pull_request'}}"
+        #uses: joshlk/jenkins-githubaction@master
+        #with:
+         #  url: ${{secrets.jenkins_url}}
+          # job_name: ${{ steps.branch_check.outputs.env_name }}-deploy-generic
+           #username: ${{inputs.jenkins_user}}
+           #api_token: ${{secrets.jenkins_password}}
+           #parameters: '{"ContainerName":"${{inputs.app_name}}", "DockerHubTag":"${{inputs.docker_tag}}"}'
+           #wait: False
+           #interval: 30
+           #timeout: "1000"   
+           
       - name: Trigger your-awesome-job-name job
-        if: "${{ steps.branch_check.outputs.env_name != '' &&  github.event_name != 'pull_request'}}"
+        continue-on-error: true
+        if: "${{ steps.branch_check.outputs.env_name != '' &&  github.event_name != 'pull_request' && steps.branch_check.outputs.deploytodemo == ''}}"
         run: |  
           environment=${{ steps.branch_check.outputs.env_name }}
           if [ -z $environment ]; then
             echo "Deployment configuration not found"
-          else
-            curl ${{secrets.jenkins_url}}/job/${{ steps.branch_check.outputs.env_name }}-deploy-generic/buildWithParameters \
+          elif [[ ${{ inputs.app_name }} == "wm-linux" ]]; then
+            echo "wm-linux not configured to deploy"
+          elif [[ ${{ inputs.app_name }} == *"wm-"* ]]; then
+            curl -s ${{secrets.jenkins_url}}/job/${{ steps.branch_check.outputs.env_name }}-deploy-wm/buildWithParameters \
              --user ${{inputs.jenkins_user}}:${{secrets.jenkins_password}} \
              --data ContainerName=${{inputs.app_name}} --data DockerHubTag=${{inputs.docker_tag}}
+            if [[ ${{steps.branch_check.outputs.env_name}} == 'qa' ]]; then # Also deploy nightly to WM's AUQA environment
+              curl -s ${{secrets.jenkins_url}}/job/auqa-deploy-wm/buildWithParameters \
+               --user ${{inputs.jenkins_user}}:${{secrets.jenkins_password}} \
+               --data ContainerName=${{inputs.app_name}} --data DockerHubTag=${{inputs.docker_tag}}
+          else
+            curl -s ${{secrets.jenkins_url}}/job/${{ steps.branch_check.outputs.env_name }}-deploy-generic/buildWithParameters \
+             --user ${{inputs.jenkins_user}}:${{secrets.jenkins_password}} \
+             --data ContainerName=${{inputs.app_name}} --data DockerHubTag=${{inputs.docker_tag}}
+ 
+             
+          fi
+      - name: Trigger your-awesome-job
+        continue-on-error: true
+        if: "${{ steps.branch_check_demo.outputs.env_name != '' &&  github.event_name != 'pull_request'}}"
+        run: |  
+          environment=${{ steps.branch_check_demo.outputs.env_name }}
+          if [ -z $environment ]; then
+            echo "Deployment configuration not found"
+          elif [[ ${{ inputs.app_name }} == "wm-linux" ]]; then
+            echo "wm-linux not configured to deploy"
+          else
+            curl -s ${{secrets.jenkins_url}}/job/${{ steps.branch_check_demo.outputs.env_name }}-deploy-generic/buildWithParameters \
+             --user ${{inputs.jenkins_user}}:${{secrets.jenkins_password}} \
+             --data ContainerName=${{inputs.app_name}} --data DockerHubTag=${{inputs.docker_tag}}
+ 
+             
           fi    
           
+      - name: Microsoft Teams Notification
+        if: "${{ steps.values.outputs.teamswebhook != '' && always()}}"
+        uses: skitionek/notify-microsoft-teams@master
+        with:
+          webhook_url: ${{secrets.MSTEAMS_WEBHOOK}}
+          overwrite: "{title: `${{inputs.app_name}} #${{ steps.values.outputs.buildnumber }} status`}"
+          job: ${{ toJson(job) }}
+          
+
+               
+          
+       
  
