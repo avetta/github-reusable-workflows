@@ -549,15 +549,17 @@ jobs:
             curl -s ${{secrets.jenkins_url}}/job/${{ steps.branch_check.outputs.env_name }}-deploy-wm/buildWithParameters \
              --user ${{inputs.jenkins_user}}:${{secrets.jenkins_password}} \
              --data ContainerName=${{inputs.app_name}} --data DockerHubTag=${{inputs.docker_tag}}
-          fi   
-          if [[ ${{steps.branch_check.outputs.env_name}} == 'qa' ]]; then # Also deploy nightly to WM's AUQA environment
+            if [[ ${{steps.branch_check.outputs.env_name}} == 'qa' ]]; then # Also deploy nightly to WM's AUQA environment
               curl -s ${{secrets.jenkins_url}}/job/auqa-deploy-wm/buildWithParameters \
                --user ${{inputs.jenkins_user}}:${{secrets.jenkins_password}} \
                --data ContainerName=${{inputs.app_name}} --data DockerHubTag=${{inputs.docker_tag}}
+            fi
           else
             curl -s ${{secrets.jenkins_url}}/job/${{ steps.branch_check.outputs.env_name }}-deploy-generic/buildWithParameters \
              --user ${{inputs.jenkins_user}}:${{secrets.jenkins_password}} \
-             --data ContainerName=${{inputs.app_name}} --data DockerHubTag=${{inputs.docker_tag}}   
+             --data ContainerName=${{inputs.app_name}} --data DockerHubTag=${{inputs.docker_tag}}
+ 
+             
           fi
       - name: Trigger your-awesome-job
         continue-on-error: true
