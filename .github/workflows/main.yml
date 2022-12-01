@@ -113,6 +113,10 @@ on:
       deploytodemo:
         description: deploytodemo
         required: false
+        type: string
+      apm_version:
+        description: apm_version
+        required: false
         type: string  
         
         
@@ -450,16 +454,16 @@ jobs:
           cat ./conf/serviceVersion.properties
           
       - name: upgrade EmbedAPM        
-        if: "${{ steps.setversion.outputs.embed_apm == 'upgrade' &&  github.event_name != 'pull_request'}}"
+        if: "${{ steps.setversion.outputs.embed_apm == 'enable' &&  github.event_name != 'pull_request'}}"
         run: |
-          curl https://download.newrelic.com/newrelic/java-agent/newrelic-agent/7.11.1/newrelic-java-7.11.1.zip --output newrelic-java-7.11.1.zip
-          unzip newrelic-java-7.11.1.zip
+          curl https://download.newrelic.com/newrelic/java-agent/newrelic-agent/${{inputs.apm_version}}/newrelic-java-${{inputs.apm_version}}.zip --output newrelic-java-${{inputs.apm_version}}.zip
+          unzip newrelic-java-${{inputs.apm_version}}.zip
           export Dockerfile="./Dockerfile"
           echo "FROM pics/${{inputs.app_name}}:${{inputs.docker_tag}}" | sudo tee -a $Dockerfile
           echo "ENV JAVA_OPTS="-javaagent:/opt/docker/lib/newrelic.jar"" | sudo tee -a $Dockerfile
           echo "ADD ./newrelic/newrelic.jar /opt/docker/lib/" | sudo tee -a $Dockerfile
-          #echo "ADD ./newrelic/newrelic.yml /opt/docker/lib/" | sudo tee -a $Dockerfile
-          echo "ADD ./conf/newrelic.yml /opt/docker/lib/" | sudo tee -a $Dockerfile
+          echo "ADD ./newrelic/newrelic.yml /opt/docker/lib/" | sudo tee -a $Dockerfile
+          #echo "ADD ./conf/newrelic.yml /opt/docker/lib/" | sudo tee -a $Dockerfile
           echo "RUN chmod u+w /opt/docker/lib/" | sudo tee -a $Dockerfile
           ls -ltr
           cat ./conf/serviceVersion.properties
