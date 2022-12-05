@@ -200,13 +200,13 @@ jobs:
         run: |
           if [ -z "${{ steps.values.outputs.github_tag }}" ]
           then
-                echo "\${{ steps.values.outputs.github_tag }} is empty"
+            echo "\${{ steps.values.outputs.github_tag }} is empty"
           else
-		if [[ "${{ inputs.app_name }}" == *"wm-"* ]]; then
-			echo "Github tags not configured to autodeploy for WM services"
-		else
-                	echo "env_name=qa" >> $GITHUB_OUTPUT
-		fi
+            if [[ "${{ inputs.app_name }}" == *"wm-"* ]]; then
+              echo "Github tags not configured to autodeploy for WM services"
+            else
+              echo "env_name=qa" >> $GITHUB_OUTPUT
+            fi
           fi
           if [ "${{ steps.values.outputs.branch_name }}" = "feature" ]; then
             echo "env_name=dev" >> $GITHUB_OUTPUT
