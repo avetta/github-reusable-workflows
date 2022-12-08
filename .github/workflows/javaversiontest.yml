@@ -168,7 +168,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: [adopt@11]
+        java: [adopt@1.11]
 
     steps:
       - uses: actions/checkout@v3
