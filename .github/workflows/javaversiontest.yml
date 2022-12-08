@@ -171,9 +171,9 @@ jobs:
   build-and-push-docker-image:
     # run only when code is compiling and tests are passing
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        java: [adopt@1.11]
+    #strategy:
+     # matrix:
+      #  java: [adopt@1.11]
 
     steps:
       - uses: actions/checkout@v3
@@ -247,7 +247,7 @@ jobs:
         if: "${{ steps.values.outputs.java == 'true'}}"
         uses: olafurpg/setup-scala@v13
         with:
-          java-version: 1.11    
+          java-version: ${{inputs.java_version}}    
 
       - name: Use Node.js ${{inputs.node-version}}
         if: "${{ steps.values.outputs.ui == 'true'}}"
