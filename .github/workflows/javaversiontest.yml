@@ -168,7 +168,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: [adopt@1.8]
+        java: [adopt@11]
 
     steps:
       - uses: actions/checkout@v3
@@ -240,7 +240,7 @@ jobs:
           
       - name: Setup Java and Scala
         if: "${{ steps.values.outputs.java == 'true'}}"
-        uses: olafurpg/setup-scala@v10
+        uses: olafurpg/setup-scala@v13
         with:
           java-version: ${{ matrix.java }}    
 
