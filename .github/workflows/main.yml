@@ -53,7 +53,12 @@ on:
       java:
         description: java
         required: false
-        type: string 
+        type: string
+      java_version:
+        description: java_version
+        required: false
+        type: string
+        default: '1.8'  
       ui:
         description: ui
         required: false
@@ -166,9 +171,9 @@ jobs:
   build-and-push-docker-image:
     # run only when code is compiling and tests are passing
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        java: [adopt@1.8]
+    #strategy:
+     # matrix:
+      #  java: [adopt@1.8]
 
     steps:
       - uses: actions/checkout@v3
@@ -240,9 +245,9 @@ jobs:
           
       - name: Setup Java and Scala
         if: "${{ steps.values.outputs.java == 'true'}}"
-        uses: olafurpg/setup-scala@v10
+        uses: olafurpg/setup-scala@v13
         with:
-          java-version: ${{ matrix.java }}    
+          java-version: ${{inputs.java_version}}    
 
       - name: Use Node.js ${{inputs.node-version}}
         if: "${{ steps.values.outputs.ui == 'true'}}"
