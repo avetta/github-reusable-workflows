@@ -329,7 +329,7 @@ jobs:
 
       - name: Run elm-test
         if: "${{ steps.values.outputs.ui == 'true'}}"
-        run: npx elm-test
+        run: npx elm-test tests/Types
 
       - name: code coverage
         if: "${{ steps.values.outputs.code_coverage == 'true'}}"
